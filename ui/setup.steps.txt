@@ -1,0 +1,13 @@
+npm install lucide-react class-variance-authority clsx tailwind-merge
+npm install -D tailwindcss postcss autoprefixer
+
+npx tailwindcss init -p
+if npx tailwindcss init -p dont works, try manually creating the tailwind.config.js and postcss.config.js files.
+
+To manually create the `tailwind.config.js` and `postcss.config.js` files, follow these steps:
+
+1. **Create `tailwind.config.js`:**
+2. **Create `postcss.config.js`:**
+
+3. **Configure `tailwind.config.js`:** Open the `tailwind.config.js` file and add the following configuration:
+

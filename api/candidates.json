@@ -1,0 +1,91 @@
+{
+    "MEMBER, HOUSE OF REPRESENTATIVES": {
+      "candidates": [
+        "1. BADELLES, OSKIE (NP)",
+        "2. ESPINA, SEIGRED (IND)",
+        "3. MIJARES, GENERAL BUBOY (NUP)",
+        "4. REGENCIA, CELSO (LAKAS)",
+        "5. SALIBAY, MANNY (IND)"
+      ],
+      "header": "MEMBER, HOUSE OF REPRESENTATIVES / Vote for 1 (Bumoto ng hindi hihigit sa 1)",
+      "voteFor": 1,
+      "count": 5
+    },
+    "MAYOR": {
+      "candidates": [
+        "1. ANDUYAN, KARGADORGENERAL (NUP)",
+        "2. GA, ROY (PMP)",
+        "3. QUIJANO, FRANKLIN (IND)",
+        "4. SIAO, FREDERICK (NP)"
+      ],
+      "header": "MAYOR / Vote for 1 (Bumoto ng hindi hihigit sa 1)",
+      "voteFor": 1,
+      "count": 4
+    },
+    "VICE-MAYOR": {
+      "candidates": [
+        "1. ALEMANIA, DODONG (NP)",
+        "2. UY, WEKWEK (PMP)",
+        "3. VERA CRUZ, JEMAR (PDPLBN)",
+        "4. VISAYA, JUN (NUP)"
+      ],
+      "header": "VICE-MAYOR / Vote for 1 (Bumoto ng hindi hihigit sa 1)",
+      "voteFor": 1,
+      "count": 4
+    },
+    "MEMBER, SANGGUNIANG PANLUNGSOD": {
+      "candidates": [
+        "1. ABRAGAN, BONG (NP)",
+        "2. ANGGOT, BRIGADAMELVIN (NP)",
+        "3. AUSTRIA, KENNETH (IND)",
+        "4. BACSARPA, ATE SOL (PDPLBN)",
+        "5. BAGUIO, CONCORDIO (IND)",
+        "6. BALLER, DONGKI (PMP)",
+        "7. BELMONTE, KING (NP)",
+        "8. BISTON, JUN (IND)",
+        "9. CAPANGPANGAN, NHICOLLE (PMP)",
+        "10. CARILLO, TESDAMAN (PDPLBN)",
+        "11. CATUBIG, GRACE (PMP)",
+        "12. ECHAVEZ, NICK (PMP)",
+        "13. EMBORONG, RAMIL (NP)",
+        "14. ENCABO, ATTY. VANNI (PMP)",
+        "15. FERNAN, TROY (NUP)",
+        "16. GAYO, MJ (NUP)",
+        "17. HUERTAS, TATAY (NP)",
+        "18. IMPERIAL, LILIBETH (NUP)",
+        "19. LAO, JULIE (IND)",
+        "20. LARRAZABAL, PISYONG (NPC)",
+        "21. LOKING, IAN (PMP)",
+        "22. MACAPAGAL, MACKY (PMP)",
+        "23. MACARAMBON, MIKE (PDPLBN)",
+        "24. MAESLIM, JONATHAN (PDPLBN)",
+        "25. MAGALLANES, BONG (PDPLBN)",
+        "26. MARIN, IKE (IND)",
+        "27. MURILLO, PASTOR VAL (PDPLBN)",
+        "28. OBINA, PASTOR (NUP)",
+        "29. ONG, ALBERT (NUP)",
+        "30. ONG, RYAN (PMP)",
+        "31. PACAÑA, TETE (NP)",
+        "32. PANGANDAMAN, ALLYSAH (NUP)",
+        "33. PLANDO, ATTY. DEMY (PMP)",
+        "34. RAZO, REX (IND)",
+        "35. RICARTE, LEO (NUP)",
+        "36. ROVIRA, VOLTAIRE II (PDPLBN)",
+        "37. SABARRE, PASTOR COCOY (NUP)",
+        "38. SALCEDO, RANDY (PDPLBN)",
+        "39. SIAO, DERRICK (NP)",
+        "40. SUMAGANG, IRVINE (NP)",
+        "41. SUMAOY, DEXTER (PMP)",
+        "42. SUMMER, SCOTT (IND)",
+        "43. SWEET, MICHELLE (NP)",
+        "44. TAMULA, TATA (NUP)",
+        "45. UY, IAN (PMP)",
+        "46. VELOSO, RICHARD (PMP)",
+        "47. YOUNG, MARLENE (NP)",
+        "48. ZALSOS, BETSY (NP)"
+      ],
+      "header": "MEMBER, SANGGUNIANG PANLUNGSOD / Vote for 12 (Bumoto ng hindi hihigit sa 12)",
+      "voteFor": 12,
+      "count": 48
+    }
+  }
