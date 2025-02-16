@@ -44,6 +44,8 @@ class Vote(Base):
     __tablename__ = "votes"
     id = Column(Integer, primary_key=True, index=True)
     voter_name = Column(String(100), index=True)
+    contact_number = Column(String(20), index=True)
+    barangay = Column(String(100), index=True)
     votes = Column(JSON)
     timestamp = Column(DateTime, default=datetime.utcnow)
 
@@ -53,6 +55,8 @@ Base.metadata.create_all(bind=engine)
 # Pydantic Models
 class VoteCreate(BaseModel):
     voter_name: str
+    contact_number: str
+    barangay: str
     votes: Dict
 
     @field_validator('votes')
@@ -83,6 +87,13 @@ class VoteCreate(BaseModel):
                 formatted_votes[position] = []
         
         return formatted_votes
+
+    @field_validator('contact_number')
+    @classmethod
+    def validate_contact(cls, v):
+        if not v.isdigit() or len(v) != 11:
+            raise ValueError('Contact number must be 11 digits')
+        return v
 
 class VoteSummary(BaseModel):
     total_votes: int
@@ -115,31 +126,52 @@ async def get_candidates():
     """Get list of all candidates per position"""
     return CANDIDATES_DATA
 
+@app.get("/api/check-contact/{contact_number}")
+async def check_contact_number(contact_number: str, db: Session = Depends(get_db)):
+    """Check if contact number has already voted"""
+    existing_vote = db.query(Vote).filter(Vote.contact_number == contact_number).first()
+    if existing_vote:
+        raise HTTPException(
+            status_code=400,
+            detail="This contact number has already been used to vote"
+        )
+    return {"message": "Contact number is available"}
+
 @app.post("/api/submit-vote")
 async def submit_vote(vote: VoteCreate, db: Session = Depends(get_db)):
     try:
-        # The votes are already validated and formatted by the Pydantic model
-        vote_summary = {
-            position: {
-                "selected": len(candidates),
-                "maximum": 8 if position == "MEMBER, SANGGUNIANG PANLUNGSOD" else 1,
-                "votes": candidates
-            }
-            for position, candidates in vote.votes.items()
-        }
+        # Check if contact number already exists
+        existing_vote = db.query(Vote).filter(Vote.contact_number == vote.contact_number).first()
+        if existing_vote:
+            raise HTTPException(
+                status_code=400,
+                detail="This contact number has already been used to vote"
+            )
         
-        db_vote = Vote(voter_name=vote.voter_name, votes=vote.votes)
+        # Create new vote
+        db_vote = Vote(
+            voter_name=vote.voter_name,
+            contact_number=vote.contact_number,
+            barangay=vote.barangay,
+            votes=vote.votes
+        )
         db.add(db_vote)
         db.commit()
-        db.refresh(db_vote)
         
         return {
             "message": "Vote submitted successfully",
-            "summary": vote_summary
+            "summary": {
+                position: {
+                    "selected": len(candidates),
+                    "maximum": 8 if position == "MEMBER, SANGGUNIANG PANLUNGSOD" else 1,
+                    "votes": candidates
+                }
+                for position, candidates in vote.votes.items()
+            }
         }
         
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail="An error occurred while submitting the vote")
 
@@ -149,36 +181,31 @@ async def get_live_results(db: Session = Depends(get_db)):
     votes = db.query(Vote).all()
     total_votes = len(votes)
     results = {}
-    barangay_stats = {}  # Track barangay counts
     
-    # Count votes by barangay
-    for vote in votes:
-        if vote.barangay:  # Only count if barangay exists
-            barangay_stats[vote.barangay] = barangay_stats.get(vote.barangay, 0) + 1
-    
-    # Process results for each position
     for position in CANDIDATES_DATA.keys():
         position_results = {}
         
+        # Track votes by barangay for each candidate
         for vote in votes:
             if position in vote.votes:
                 for candidate in vote.votes[position]:
                     if candidate not in position_results:
                         position_results[candidate] = {
                             "votes": 0,
-                            "votes_by_barangay": {}
+                            "votes_by_barangay": {},
+                            "percentage": 0,
+                            "percentage_by_barangay": {}
                         }
                     
                     position_results[candidate]["votes"] += 1
                     
                     # Track barangay-specific votes
-                    if vote.barangay:  # Only track if barangay exists
-                        brgy = vote.barangay
-                        if brgy not in position_results[candidate]["votes_by_barangay"]:
-                            position_results[candidate]["votes_by_barangay"][brgy] = 0
-                        position_results[candidate]["votes_by_barangay"][brgy] += 1
+                    brgy = vote.barangay
+                    if brgy not in position_results[candidate]["votes_by_barangay"]:
+                        position_results[candidate]["votes_by_barangay"][brgy] = 0
+                    position_results[candidate]["votes_by_barangay"][brgy] += 1
         
-        # Calculate overall percentages
+        # Calculate percentages
         if position_results:
             total_position_votes = sum(c["votes"] for c in position_results.values())
             for candidate in position_results:
@@ -187,14 +214,13 @@ async def get_live_results(db: Session = Depends(get_db)):
                 )
                 
                 # Calculate barangay-specific percentages
-                for brgy, brgy_votes in position_results[candidate]["votes_by_barangay"].items():
+                for brgy in BARANGAYS:
+                    brgy_votes = position_results[candidate]["votes_by_barangay"].get(brgy, 0)
                     total_brgy_votes = sum(
                         c["votes_by_barangay"].get(brgy, 0) 
                         for c in position_results.values()
                     )
                     if total_brgy_votes > 0:
-                        if "percentage_by_barangay" not in position_results[candidate]:
-                            position_results[candidate]["percentage_by_barangay"] = {}
                         position_results[candidate]["percentage_by_barangay"][brgy] = round(
                             (brgy_votes / total_brgy_votes * 100), 2
                         )
@@ -208,7 +234,7 @@ async def get_live_results(db: Session = Depends(get_db)):
         "total_votes": total_votes,
         "last_updated": datetime.utcnow(),
         "results": results,
-        "votes": [{"barangay": k, "count": v} for k, v in barangay_stats.items()]  # Barangay distribution
+        "votes": [{"barangay": vote.barangay} for vote in votes]  # For barangay distribution
     }
 
 @app.get("/api/results/{position}")
@@ -266,6 +292,56 @@ async def get_hourly_stats(db: Session = Depends(get_db)):
             }
             for stat in hourly_stats
         ]
+    }
+
+@app.get("/api/results/barangay/{barangay}")
+async def get_barangay_results(barangay: str, db: Session = Depends(get_db)):
+    """Get voting results filtered by barangay"""
+    # Get votes for specific barangay
+    votes = db.query(Vote).filter(Vote.barangay == barangay).all()
+    total_barangay_votes = len(votes)
+    results = {}
+    
+    for position in CANDIDATES_DATA.keys():
+        position_results = {}
+        
+        # Count votes for each candidate in this barangay
+        for vote in votes:
+            if position in vote.votes:
+                for candidate in vote.votes[position]:
+                    if candidate not in position_results:
+                        position_results[candidate] = {
+                            "votes": 0,
+                            "percentage": 0
+                        }
+                    position_results[candidate]["votes"] += 1
+        
+        # Calculate percentages for this barangay
+        if position_results:
+            total_position_votes = sum(c["votes"] for c in position_results.values())
+            for candidate in position_results:
+                position_results[candidate]["percentage"] = round(
+                    (position_results[candidate]["votes"] / total_position_votes * 100), 2
+                )
+        
+        # Add candidates with zero votes
+        for candidate in CANDIDATES_DATA[position]["candidates"]:
+            if candidate not in position_results:
+                position_results[candidate] = {
+                    "votes": 0,
+                    "percentage": 0
+                }
+        
+        results[position] = {
+            "total_votes": total_barangay_votes,
+            "candidates": position_results
+        }
+    
+    return {
+        "barangay": barangay,
+        "total_votes": total_barangay_votes,
+        "last_updated": datetime.utcnow(),
+        "results": results
     }
 
 if __name__ == "__main__":

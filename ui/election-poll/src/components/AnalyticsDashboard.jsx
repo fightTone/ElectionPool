@@ -17,23 +17,30 @@ const AnalyticsDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://3.84.6.19:8080/api/results/live');
+        const url = selectedBarangay === 'All' 
+          ? 'http://3.84.6.19:8080/api/results/live'
+          : `http://3.84.6.19:8080/api/results/barangay/${selectedBarangay}`;
+        
+        const response = await fetch(url);
         const data = await response.json();
         setResults(data);
         
-        // Calculate barangay distribution
-        const barangayCounts = {};
-        data.votes?.forEach(vote => {
-          barangayCounts[vote.barangay] = (barangayCounts[vote.barangay] || 0) + 1;
-        });
+        // Calculate barangay distribution only for overall results
+        if (selectedBarangay === 'All') {
+          const barangayCounts = {};
+          data.votes?.forEach(vote => {
+            barangayCounts[vote.barangay] = (barangayCounts[vote.barangay] || 0) + 1;
+          });
+          
+          const barangayData = Object.entries(barangayCounts).map(([name, value]) => ({
+            name,
+            value,
+            percentage: (value / data.total_votes) * 100
+          }));
+          
+          setBarangayStats(barangayData);
+        }
         
-        const barangayData = Object.entries(barangayCounts).map(([name, value]) => ({
-          name,
-          value,
-          percentage: (value / data.total_votes) * 100
-        }));
-        
-        setBarangayStats(barangayData);
         setLoading(false);
       } catch (err) {
         setError('Failed to load results');
@@ -42,10 +49,9 @@ const AnalyticsDashboard = () => {
     };
 
     fetchData();
-    // Refresh data every 30 seconds
     const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [selectedBarangay]); // Add selectedBarangay as dependency
 
   if (loading) {
     return (
