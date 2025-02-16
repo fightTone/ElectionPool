@@ -87,7 +87,12 @@ const VotingInterface = () => {
         setError('');
       } else {
         const data = await response.json();
+        // Display the error message from the backend
         setError(data.detail || 'Failed to submit vote');
+        // If it's a duplicate contact number error, reset to step 1
+        if (data.detail?.includes('already been used')) {
+          setStep(1);
+        }
       }
     } catch (err) {
       setError('Error submitting vote: ' + err.message);

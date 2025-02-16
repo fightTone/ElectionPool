@@ -129,16 +129,15 @@ async def get_candidates():
 @app.post("/api/submit-vote")
 async def submit_vote(vote: VoteCreate, db: Session = Depends(get_db)):
     try:
-        # The votes are already validated and formatted by the Pydantic model
-        vote_summary = {
-            position: {
-                "selected": len(candidates),
-                "maximum": 8 if position == "MEMBER, SANGGUNIANG PANLUNGSOD" else 1,
-                "votes": candidates
-            }
-            for position, candidates in vote.votes.items()
-        }
+        # Check if contact number already exists
+        existing_vote = db.query(Vote).filter(Vote.contact_number == vote.contact_number).first()
+        if existing_vote:
+            raise HTTPException(
+                status_code=400,
+                detail="This contact number has already been used to vote"
+            )
         
+        # Create new vote
         db_vote = Vote(
             voter_name=vote.voter_name,
             contact_number=vote.contact_number,
@@ -147,15 +146,21 @@ async def submit_vote(vote: VoteCreate, db: Session = Depends(get_db)):
         )
         db.add(db_vote)
         db.commit()
-        db.refresh(db_vote)
         
         return {
             "message": "Vote submitted successfully",
-            "summary": vote_summary
+            "summary": {
+                position: {
+                    "selected": len(candidates),
+                    "maximum": 8 if position == "MEMBER, SANGGUNIANG PANLUNGSOD" else 1,
+                    "votes": candidates
+                }
+                for position, candidates in vote.votes.items()
+            }
         }
         
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail="An error occurred while submitting the vote")
 
