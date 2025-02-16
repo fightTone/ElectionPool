@@ -126,6 +126,17 @@ async def get_candidates():
     """Get list of all candidates per position"""
     return CANDIDATES_DATA
 
+@app.get("/api/check-contact/{contact_number}")
+async def check_contact_number(contact_number: str, db: Session = Depends(get_db)):
+    """Check if contact number has already voted"""
+    existing_vote = db.query(Vote).filter(Vote.contact_number == contact_number).first()
+    if existing_vote:
+        raise HTTPException(
+            status_code=400,
+            detail="This contact number has already been used to vote"
+        )
+    return {"message": "Contact number is available"}
+
 @app.post("/api/submit-vote")
 async def submit_vote(vote: VoteCreate, db: Session = Depends(get_db)):
     try:

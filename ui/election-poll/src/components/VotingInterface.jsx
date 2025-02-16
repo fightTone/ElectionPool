@@ -29,7 +29,21 @@ const VotingInterface = () => {
       });
   }, []);
 
-  const handleNameSubmit = (e) => {
+  const checkContactNumber = async (number) => {
+    try {
+      const response = await fetch(`http://3.84.6.19:8080/api/check-contact/${number}`);
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.detail);
+      }
+      return true;
+    } catch (err) {
+      setError(err.message);
+      return false;
+    }
+  };
+
+  const handleNameSubmit = async (e) => {
     e.preventDefault();
     if (voterName.trim().length < 2) {
       setError('Please enter a valid name (minimum 2 characters)');
@@ -43,6 +57,13 @@ const VotingInterface = () => {
       setError('Please select your barangay');
       return;
     }
+
+    // Check if contact number has already voted
+    const canProceed = await checkContactNumber(contactNumber);
+    if (!canProceed) {
+      return;
+    }
+
     setError('');
     setStep(2);
   };
