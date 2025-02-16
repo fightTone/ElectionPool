@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { BarChart2, Users } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart2, Users, MapPin } from 'lucide-react';
+import { BARANGAYS } from '../constants/barangays';
+
+const COLORS = ['#22c55e', '#15803d', '#166534', '#14532d', '#047857', '#059669', '#10b981', '#34d399'];
 
 const AnalyticsDashboard = () => {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedPosition, setSelectedPosition] = useState('MAYOR');
+  const [selectedBarangay, setSelectedBarangay] = useState('All');
+  const [barangayStats, setBarangayStats] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -15,6 +20,20 @@ const AnalyticsDashboard = () => {
         const response = await fetch('http://3.84.6.19:8080/api/results/live');
         const data = await response.json();
         setResults(data);
+        
+        // Calculate barangay distribution
+        const barangayCounts = {};
+        data.votes?.forEach(vote => {
+          barangayCounts[vote.barangay] = (barangayCounts[vote.barangay] || 0) + 1;
+        });
+        
+        const barangayData = Object.entries(barangayCounts).map(([name, value]) => ({
+          name,
+          value,
+          percentage: (value / data.total_votes) * 100
+        }));
+        
+        setBarangayStats(barangayData);
         setLoading(false);
       } catch (err) {
         setError('Failed to load results');
@@ -55,11 +74,22 @@ const AnalyticsDashboard = () => {
   const prepareChartData = (position) => {
     if (!results?.results[position]?.candidates) return [];
     
-    return Object.entries(results.results[position].candidates).map(([name, data]) => ({
+    let candidateData = Object.entries(results.results[position].candidates).map(([name, data]) => ({
       name: name.split('.')[1].trim(), // Remove the number prefix
       votes: data.votes,
       percentage: data.percentage
     }));
+
+    // Filter by barangay if selected
+    if (selectedBarangay !== 'All') {
+      candidateData = candidateData.map(candidate => ({
+        ...candidate,
+        votes: candidate.votes_by_barangay?.[selectedBarangay] || 0,
+        percentage: candidate.percentage_by_barangay?.[selectedBarangay] || 0
+      }));
+    }
+
+    return candidateData;
   };
 
   return (
@@ -92,6 +122,69 @@ const AnalyticsDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Barangay Filter */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="w-5 h-5" />
+              Barangay Filter
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <select
+              value={selectedBarangay}
+              onChange={(e) => setSelectedBarangay(e.target.value)}
+              className="w-full p-2 rounded-md border border-gray-800 bg-gray-900/50 text-gray-100 outline-none"
+            >
+              <option value="All">All Barangays</option>
+              {BARANGAYS.map((brgy) => (
+                <option key={brgy} value={brgy} className="bg-gray-900">
+                  {brgy}
+                </option>
+              ))}
+            </select>
+          </CardContent>
+        </Card>
+
+        {/* Barangay Distribution */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Votes by Barangay</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px] sm:h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={barangayStats}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={120}
+                    label={({name, percentage}) => `${name} (${percentage.toFixed(1)}%)`}
+                  >
+                    {barangayStats.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      border: '1px solid #374151',
+                      borderRadius: '0.375rem'
+                    }}
+                    formatter={(value, name, props) => [
+                      `${value} votes (${props.payload.percentage.toFixed(1)}%)`,
+                      name
+                    ]}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Position Selector */}
         <Card>
@@ -159,7 +252,9 @@ const AnalyticsDashboard = () => {
         {/* Detailed Results Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Detailed Results</CardTitle>
+            <CardTitle>
+              Detailed Results {selectedBarangay !== 'All' ? `- ${selectedBarangay}` : ''}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">

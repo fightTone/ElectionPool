@@ -178,28 +178,52 @@ async def submit_vote(vote: VoteCreate, db: Session = Depends(get_db)):
 @app.get("/api/results/live")
 async def get_live_results(db: Session = Depends(get_db)):
     """Get live voting results for all positions"""
-    total_votes = db.query(Vote).count()
+    votes = db.query(Vote).all()
+    total_votes = len(votes)
     results = {}
     
     for position in CANDIDATES_DATA.keys():
         position_results = {}
-        votes = db.query(Vote).all()
         
+        # Track votes by barangay for each candidate
         for vote in votes:
             if position in vote.votes:
                 for candidate in vote.votes[position]:
-                    position_results[candidate] = position_results.get(candidate, 0) + 1
+                    if candidate not in position_results:
+                        position_results[candidate] = {
+                            "votes": 0,
+                            "votes_by_barangay": {},
+                            "percentage": 0,
+                            "percentage_by_barangay": {}
+                        }
+                    
+                    position_results[candidate]["votes"] += 1
+                    
+                    # Track barangay-specific votes
+                    brgy = vote.barangay
+                    if brgy not in position_results[candidate]["votes_by_barangay"]:
+                        position_results[candidate]["votes_by_barangay"][brgy] = 0
+                    position_results[candidate]["votes_by_barangay"][brgy] += 1
         
         # Calculate percentages
         if position_results:
-            total_position_votes = sum(position_results.values())
-            position_results = {
-                candidate: {
-                    "votes": votes,
-                    "percentage": round((votes / total_position_votes) * 100, 2)
-                }
-                for candidate, votes in position_results.items()
-            }
+            total_position_votes = sum(c["votes"] for c in position_results.values())
+            for candidate in position_results:
+                position_results[candidate]["percentage"] = round(
+                    (position_results[candidate]["votes"] / total_position_votes * 100), 2
+                )
+                
+                # Calculate barangay-specific percentages
+                for brgy in BARANGAYS:
+                    brgy_votes = position_results[candidate]["votes_by_barangay"].get(brgy, 0)
+                    total_brgy_votes = sum(
+                        c["votes_by_barangay"].get(brgy, 0) 
+                        for c in position_results.values()
+                    )
+                    if total_brgy_votes > 0:
+                        position_results[candidate]["percentage_by_barangay"][brgy] = round(
+                            (brgy_votes / total_brgy_votes * 100), 2
+                        )
         
         results[position] = {
             "total_votes": total_votes,
@@ -209,7 +233,8 @@ async def get_live_results(db: Session = Depends(get_db)):
     return {
         "total_votes": total_votes,
         "last_updated": datetime.utcnow(),
-        "results": results
+        "results": results,
+        "votes": [{"barangay": vote.barangay} for vote in votes]  # For barangay distribution
     }
 
 @app.get("/api/results/{position}")
