@@ -2,19 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
 import { User, CheckCircle2 } from 'lucide-react';
+import { BARANGAYS } from '../constants/barangays';
 
 const VotingInterface = () => {
   const [step, setStep] = useState(1);
   const [voterName, setVoterName] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
   const [votes, setVotes] = useState({});
   const [candidates, setCandidates] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [barangay, setBarangay] = useState('');
 
   useEffect(() => {
     // Fetch candidates when component mounts
-    fetch('http://127.0.0.1:8080/api/candidates')
+    fetch('http://3.84.6.19:8080/api/candidates')
       .then(res => res.json())
       .then(data => {
         setCandidates(data);
@@ -30,6 +33,14 @@ const VotingInterface = () => {
     e.preventDefault();
     if (voterName.trim().length < 2) {
       setError('Please enter a valid name (minimum 2 characters)');
+      return;
+    }
+    if (!contactNumber || contactNumber.length < 11) {
+      setError('Please enter a valid contact number');
+      return;
+    }
+    if (!barangay) {
+      setError('Please select your barangay');
       return;
     }
     setError('');
@@ -58,13 +69,15 @@ const VotingInterface = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8080/api/submit-vote', {
+      const response = await fetch('http://3.84.6.19:8080/api/submit-vote', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           voter_name: voterName,
+          contact_number: contactNumber,
+          barangay: barangay,
           votes: votes
         }),
       });
@@ -83,7 +96,7 @@ const VotingInterface = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <div className="flex justify-center items-center min-h-screen bg-background">
         <Card className="w-full max-w-md p-6">
           <CardContent>
             <div className="text-center">Loading candidates...</div>
@@ -93,15 +106,27 @@ const VotingInterface = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-background">
+        <Card className="w-full max-w-md p-6">
+          <CardContent>
+            <div className="text-center text-red-600">{error}</div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (success) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <div className="flex justify-center items-start min-h-screen pt-20">
         <Card className="w-full max-w-md">
           <CardContent className="p-6">
             <div className="text-center space-y-4">
               <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto" />
-              <h2 className="text-2xl font-semibold">Thank You for Voting!</h2>
-              <p className="text-gray-600">Your vote has been successfully recorded.</p>
+              <h2 className="text-2xl font-semibold text-gray-100">Thank You for Voting!</h2>
+              <p className="text-gray-400">Your vote has been successfully recorded.</p>
             </div>
           </CardContent>
         </Card>
@@ -110,10 +135,10 @@ const VotingInterface = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <Card className="max-w-2xl mx-auto">
+    <div className="min-h-screen py-4 sm:py-8 px-2 sm:px-4">
+      <Card className="w-full max-w-2xl mx-auto border-gray-800">
         <CardHeader>
-          <CardTitle className="text-center">Election Poll 2025</CardTitle>
+          <CardTitle className="text-center text-xl sm:text-2xl">Election Poll 2025</CardTitle>
         </CardHeader>
         <CardContent>
           {error && (
@@ -124,24 +149,60 @@ const VotingInterface = () => {
 
           {step === 1 ? (
             <form onSubmit={handleNameSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Please enter your name to begin voting
-                </label>
-                <div className="flex items-center space-x-2 border rounded-md p-2">
-                  <User className="w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={voterName}
-                    onChange={(e) => setVoterName(e.target.value)}
-                    className="flex-1 outline-none"
-                    placeholder="Your full name"
-                  />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Please enter your name to begin voting
+                  </label>
+                  <div className="flex items-center space-x-2 border border-gray-800 rounded-md p-2 bg-gray-900/50">
+                    <User className="w-5 h-5 text-green-500" />
+                    <input
+                      type="text"
+                      value={voterName}
+                      onChange={(e) => setVoterName(e.target.value)}
+                      className="flex-1 outline-none bg-transparent text-gray-100 placeholder-gray-500 w-full"
+                      placeholder="Your full name"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Enter your contact number
+                  </label>
+                  <div className="flex items-center space-x-2 border border-gray-800 rounded-md p-2 bg-gray-900/50">
+                    <input
+                      type="tel"
+                      value={contactNumber}
+                      onChange={(e) => setContactNumber(e.target.value)}
+                      className="flex-1 outline-none bg-transparent text-gray-100 placeholder-gray-500 w-full"
+                      placeholder="e.g., 09123456789"
+                      maxLength={11}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Select your barangay
+                  </label>
+                  <select
+                    value={barangay}
+                    onChange={(e) => setBarangay(e.target.value)}
+                    className="w-full p-2 rounded-md border border-gray-800 bg-gray-900/50 text-gray-100 outline-none"
+                  >
+                    <option value="">Select Barangay</option>
+                    {BARANGAYS.map((brgy) => (
+                      <option key={brgy} value={brgy} className="bg-gray-900">
+                        {brgy}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <button
                 type="submit"
-                className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition"
+                className="w-full bg-green-600 text-white font-medium py-2 rounded-md hover:bg-green-500 transition"
               >
                 Continue to Vote
               </button>
@@ -150,9 +211,9 @@ const VotingInterface = () => {
             <div className="space-y-6">
               {candidates && Object.entries(candidates).map(([position, data]) => (
                 <div key={position} className="border-b pb-4">
-                  <h3 className="font-medium mb-2 text-lg">
+                  <h3 className="font-medium mb-2 text-base sm:text-lg">
                     {position}
-                    <span className="text-sm text-gray-500 ml-2">
+                    <span className="text-xs sm:text-sm text-gray-500 ml-2 block sm:inline mt-1 sm:mt-0">
                       (Select {position === "MEMBER, SANGGUNIANG PANLUNGSOD" ? "up to 8" : "1"})
                     </span>
                   </h3>
@@ -165,8 +226,8 @@ const VotingInterface = () => {
                           onClick={() => handleVoteChange(position, candidate)}
                           className={`w-full text-left p-3 rounded transition ${
                             isSelected 
-                              ? 'bg-blue-50 border-blue-500 border text-blue-700' 
-                              : 'hover:bg-gray-50 border border-gray-200'
+                              ? 'bg-green-500/20 border-green-500 border text-green-400' 
+                              : 'hover:bg-gray-800/50 border border-gray-800'
                           }`}
                         >
                           {candidate}
@@ -179,7 +240,7 @@ const VotingInterface = () => {
               
               <button
                 onClick={handleSubmit}
-                className="w-full bg-green-500 text-white py-3 rounded-md hover:bg-green-600 transition font-medium"
+                className="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-500 transition font-medium"
               >
                 Submit Votes
               </button>

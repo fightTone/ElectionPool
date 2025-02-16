@@ -2,3 +2,4 @@
 *.venv
 *.env
 *.pyc
+*portforward_app.sh

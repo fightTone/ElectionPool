@@ -12,7 +12,7 @@ const AnalyticsDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8080/api/results/live');
+        const response = await fetch('http://3.84.6.19:8080/api/results/live');
         const data = await response.json();
         setResults(data);
         setLoading(false);
@@ -30,7 +30,7 @@ const AnalyticsDashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <div className="flex justify-center items-center min-h-screen bg-background">
         <Card className="w-full max-w-md p-6">
           <CardContent>
             <div className="text-center">Loading results...</div>
@@ -42,7 +42,7 @@ const AnalyticsDashboard = () => {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <div className="flex justify-center items-center min-h-screen bg-background">
         <Card className="w-full max-w-md p-6">
           <CardContent>
             <div className="text-center text-red-600">{error}</div>
@@ -63,14 +63,14 @@ const AnalyticsDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen py-4 sm:py-8 px-2 sm:px-4">
+      <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* Header Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
-                <Users className="w-8 h-8 text-blue-500" />
+                <Users className="w-8 h-8 text-green-500" />
                 <div>
                   <p className="text-sm text-gray-500">Total Votes Cast</p>
                   <h3 className="text-2xl font-bold">{results?.total_votes || 0}</h3>
@@ -98,15 +98,15 @@ const AnalyticsDashboard = () => {
           <CardHeader>
             <CardTitle>Select Position</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
+          <CardContent className="flex flex-wrap gap-1 sm:gap-2">
             {results && Object.keys(results.results).map((position) => (
               <button
                 key={position}
                 onClick={() => setSelectedPosition(position)}
-                className={`px-4 py-2 rounded-full text-sm ${
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm ${
                   selectedPosition === position
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 hover:bg-gray-200'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-800 hover:bg-gray-700'
                 }`}
               >
                 {position}
@@ -121,25 +121,35 @@ const AnalyticsDashboard = () => {
             <CardTitle>{selectedPosition} Results</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[400px]">
+            <div className="h-[300px] sm:h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={prepareChartData(selectedPosition)}>
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" /> {/* Darker grid lines */}
                   <XAxis 
                     dataKey="name" 
                     angle={-45}
                     textAnchor="end"
-                    height={80}
+                    height={100}
                     interval={0}
+                    stroke="#fff"  // Make axis labels white
+                    fontSize={10}
+                    tick={{ fontSize: 10 }}
                   />
-                  <YAxis />
+                  <YAxis stroke="#fff" /> {/* Make axis labels white */}
                   <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1f2937', 
+                      border: '1px solid #374151',
+                      borderRadius: '0.375rem'
+                    }}
+                    labelStyle={{ color: '#e5e7eb' }}
+                    itemStyle={{ color: '#22c55e' }}
                     formatter={(value, name) => [
                       name === 'percentage' ? `${value.toFixed(1)}%` : value,
                       name === 'percentage' ? 'Percentage' : 'Votes'
                     ]}
                   />
-                  <Bar dataKey="votes" fill="#3b82f6" />
+                  <Bar dataKey="votes" fill="#22c55e" /> {/* Changed to green-500 */}
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -153,12 +163,12 @@ const AnalyticsDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-xs sm:text-sm">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4">Candidate</th>
-                    <th className="text-right py-3 px-4">Votes</th>
-                    <th className="text-right py-3 px-4">Percentage</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-4">Candidate</th>
+                    <th className="text-right py-2 sm:py-3 px-2 sm:px-4">Votes</th>
+                    <th className="text-right py-2 sm:py-3 px-2 sm:px-4">Percentage</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -166,7 +176,7 @@ const AnalyticsDashboard = () => {
                     Object.entries(results.results[selectedPosition].candidates)
                       .sort((a, b) => b[1].votes - a[1].votes)
                       .map(([candidate, data]) => (
-                        <tr key={candidate} className="border-b hover:bg-gray-50">
+                        <tr key={candidate} className="border-b border-gray-800 hover:bg-gray-800/50">
                           <td className="py-3 px-4">{candidate}</td>
                           <td className="text-right py-3 px-4">{data.votes}</td>
                           <td className="text-right py-3 px-4">

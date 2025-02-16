@@ -1,0 +1,95 @@
+{
+    "MEMBER, HOUSE OF REPRESENTATIVES": {
+        "candidates": [
+        "1. ABBAS, JOE (UNA)",
+        "2. DIMAPORO, ANGGING (PFP)"
+        ],
+        "header": "MEMBER, HOUSE OF REPRESENTATIVES / Vote for 1 (Bumoto ng hindi hihigit sa 1)",
+        "voteFor": 1,
+        "count": 2
+    },
+    "PROVINCIAL GOVERNOR": {
+        "candidates": [
+        "1. ABUBACAR, SABDULLAH (UNA)",
+        "2. DIMAPORO, KHALID (LAKAS)"
+        ],
+        "header": "PROVINCIAL GOVERNOR / Vote for 1 (Bumoto ng hindi hihigit sa 1)",
+        "voteFor": 1,
+        "count": 2
+    },
+    "PROVINCIAL VICE-GOVERNOR": {
+        "candidates": [
+        "1. LIM, ALLAN (LAKAS)",
+        "2. SALACOP, MACK (UNA)"
+        ],
+        "header": "PROVINCIAL VICE-GOVERNOR / Vote for 1 (Bumoto ng hindi hihigit sa 1)",
+        "voteFor": 1,
+        "count": 2
+    },
+    "MEMBER, SANGGUNIANG PANLALAWIGAN": {
+        "candidates": [
+        "1. ANDOT, BOB (UNLAD)",
+        "2. DALIGDIG, RANOLFO (UNA)",
+        "3. DIBARATUN, SIDICK (LAKAS)",
+        "4. MACARAMBON, DJAM (UNLAD)",
+        "5. MATALINES, GRECILLE (LAKAS)",
+        "6. MIMBISA, ALI JR. (IND)",
+        "7. OBIAL, ELEUTERIO JR. (LAKAS)"
+        ],
+        "header": "MEMBER, SANGGUNIANG PANLALAWIGAN / Vote for 5 (Bumoto ng hindi hihigit sa 5)",
+        "voteFor": 5,
+        "count": 7
+    },
+    "MAYOR": {
+        "candidates": [
+        "1. BAYAL, MANOY (IND)",
+        "2. CHANG, TATA (LAKAS)",
+        "3. PESTOLANTE, CHE-CHE (PDPLBN)"
+        ],
+        "header": "MAYOR / Vote for 1 (Bumoto ng hindi hihigit sa 1)",
+        "voteFor": 1,
+        "count": 3
+    },
+    "VICE-MAYOR": {
+        "candidates": [
+        "1. BAYAL, LEX (IND)",
+        "2. CHAN, EDNA (IND)",
+        "3. MACAPIL, RANDY (LAKAS)",
+        "4. SIALONGO, RANDY (PDPLBN)"
+        ],
+        "header": "VICE-MAYOR / Vote for 1 (Bumoto ng hindi hihigit sa 1)",
+        "voteFor": 1,
+        "count": 4
+    },
+    "MEMBER, SANGGUNIANG BAYAN": {
+        "candidates": [
+        "1. ACHONDO, MACKING (IND)",
+        "2. ALFECHE, ENGR. BOGS (IND)",
+        "3. AMESOLA, ALVEN (PDPLBN)",
+        "4. BACLAAN, ALAN (UNLAD)",
+        "5. BAYAL, GAR (IND)",
+        "6. CANONIGO, ALBERTO (IND)",
+        "7. CANOY-LADLAD, RIMA (UNLAD)",
+        "8. CHAN, ROQUE (IND)",
+        "9. DEAÑO, MARK NOEL (UNLAD)",
+        "10. DELA TORRE, BERTING (IND)",
+        "11. ESTAMO, ELLEN (IND)",
+        "12. GENTAPA, RITO (IND)",
+        "13. LACIDA, DODO (IND)",
+        "14. LORENZO, VON-VON (PDPLBN)",
+        "15. MACAPIL, KIMPEE KM (UNLAD)",
+        "16. MACUD, AMAD (PDPLBN)",
+        "17. OPENIANO, EDGAR (IND)",
+        "18. OZARRAGA, BOY (IND)",
+        "19. OZARRAGA, JONG-JONG (PDPLBN)",
+        "20. PACQUIAO, JAPE (IND)",
+        "21. PAJO, NILO (UNLAD)",
+        "22. PARADELA, IAN (PDPLBN)",
+        "23. PICARDAL, SAMMY (IND)",
+        "24. SIALONGO, FRETZ (PDPLBN)"
+        ],
+        "header": "MEMBER, SANGGUNIANG BAYAN / Vote for 8 (Bumoto ng hindi hihigit sa 8)",
+        "voteFor": 8,
+        "count": 24
+    }
+}

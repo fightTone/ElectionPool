@@ -44,6 +44,8 @@ class Vote(Base):
     __tablename__ = "votes"
     id = Column(Integer, primary_key=True, index=True)
     voter_name = Column(String(100), index=True)
+    contact_number = Column(String(20), index=True)
+    barangay = Column(String(100), index=True)
     votes = Column(JSON)
     timestamp = Column(DateTime, default=datetime.utcnow)
 
@@ -53,6 +55,8 @@ Base.metadata.create_all(bind=engine)
 # Pydantic Models
 class VoteCreate(BaseModel):
     voter_name: str
+    contact_number: str
+    barangay: str
     votes: Dict
 
     @field_validator('votes')
@@ -83,6 +87,13 @@ class VoteCreate(BaseModel):
                 formatted_votes[position] = []
         
         return formatted_votes
+
+    @field_validator('contact_number')
+    @classmethod
+    def validate_contact(cls, v):
+        if not v.isdigit() or len(v) != 11:
+            raise ValueError('Contact number must be 11 digits')
+        return v
 
 class VoteSummary(BaseModel):
     total_votes: int
@@ -128,7 +139,12 @@ async def submit_vote(vote: VoteCreate, db: Session = Depends(get_db)):
             for position, candidates in vote.votes.items()
         }
         
-        db_vote = Vote(voter_name=vote.voter_name, votes=vote.votes)
+        db_vote = Vote(
+            voter_name=vote.voter_name,
+            contact_number=vote.contact_number,
+            barangay=vote.barangay,
+            votes=vote.votes
+        )
         db.add(db_vote)
         db.commit()
         db.refresh(db_vote)
