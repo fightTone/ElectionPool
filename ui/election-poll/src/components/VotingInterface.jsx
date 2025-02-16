@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
-import { User, CheckCircle2 } from 'lucide-react';
+import { User, CheckCircle2, X } from 'lucide-react';
 import { BARANGAYS } from '../constants/barangays';
 
 const VotingInterface = () => {
@@ -120,6 +120,10 @@ const VotingInterface = () => {
     }
   };
 
+  const handleCloseError = () => {
+    setError('');
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-background">
@@ -134,10 +138,22 @@ const VotingInterface = () => {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background">
-        <Card className="w-full max-w-md p-6">
+      <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+        <Card className="w-full max-w-md p-6 relative">
+          <button
+            onClick={handleCloseError}
+            className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-800/50"
+          >
+            <X className="w-5 h-5 text-gray-400" />
+          </button>
           <CardContent>
-            <div className="text-center text-red-600">{error}</div>
+            <div className="text-center text-red-500 mb-4">{error}</div>
+            <button
+              onClick={handleCloseError}
+              className="w-full bg-gray-600 text-white py-2 rounded-md hover:bg-gray-500 transition"
+            >
+              Close
+            </button>
           </CardContent>
         </Card>
       </div>
@@ -168,8 +184,14 @@ const VotingInterface = () => {
         </CardHeader>
         <CardContent>
           {error && (
-            <Alert className="mb-4 bg-red-50 border-red-200 text-red-700">
+            <Alert className="mb-4 bg-red-50 border-red-200 text-red-700 relative">
               <AlertDescription>{error}</AlertDescription>
+              <button
+                onClick={handleCloseError}
+                className="absolute top-2 right-2 p-1 rounded-full hover:bg-red-200/50"
+              >
+                <X className="w-4 h-4 text-red-500" />
+              </button>
             </Alert>
           )}
 
