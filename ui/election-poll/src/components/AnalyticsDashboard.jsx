@@ -80,22 +80,16 @@ const AnalyticsDashboard = () => {
   const prepareChartData = (position) => {
     if (!results?.results[position]?.candidates) return [];
     
-    let candidateData = Object.entries(results.results[position].candidates).map(([name, data]) => ({
-      name: name.split('.')[1].trim(), // Remove the number prefix
+    // Get candidates data
+    const candidateEntries = Object.entries(results.results[position].candidates);
+    
+    // Map the data according to the response structure
+    return candidateEntries.map(([name, data]) => ({
+      name: name.split('.')[1]?.trim() || name,  // Handle cases without number prefix
       votes: data.votes,
       percentage: data.percentage
-    }));
-
-    // Filter by barangay if selected
-    if (selectedBarangay !== 'All') {
-      candidateData = candidateData.map(candidate => ({
-        ...candidate,
-        votes: candidate.votes_by_barangay?.[selectedBarangay] || 0,
-        percentage: candidate.percentage_by_barangay?.[selectedBarangay] || 0
-      }));
-    }
-
-    return candidateData;
+    }))
+    .sort((a, b) => b.votes - a.votes);  // Sort by votes in descending order
   };
 
   return (
