@@ -9,6 +9,20 @@ import os
 from dotenv import load_dotenv
 import json
 
+# Add BARANGAYS list after imports
+BARANGAYS = [
+    'Abuno', 'Acmac', 'Bagong Silang', 'Bonbonon', 'Bunawan',
+    'Buru-un', 'Dalipuga', 'Del Carmen', 'Digkilaan', 'Ditucalan',
+    'Dulag', 'Hinaplanon', 'Hindang', 'Kabacsanan', 'Kalilangan',
+    'Kiwalan', 'Lanipao', 'Luinab', 'Mahayhay', 'Mainit',
+    'Mandulog', 'Maria Cristina', 'Palao', 'Panoroganan', 'Poblacion',
+    'Puga-an', 'Rogongon', 'San Miguel', 'San Roque', 'Santa Elena',
+    'Santa Filomena', 'Santiago', 'Santo Rosario', 'Saray-Tibanga',
+    'Suarez', 'Tambacan', 'Tibanga', 'Tipanoy', 'Tominobo Proper',
+    'Tominobo Upper', 'Tubod', 'Ubaldo Laya', 'Upper Hinaplanon',
+    'Villa Verde'
+]
+
 # Load environment variables
 load_dotenv()
 
@@ -181,7 +195,13 @@ async def get_live_results(db: Session = Depends(get_db)):
     votes = db.query(Vote).all()
     total_votes = len(votes)
     results = {}
+    barangay_stats = {}  # Track barangay counts
     
+    # Count votes by barangay
+    for vote in votes:
+        if vote.barangay:  # Only count if barangay exists
+            barangay_stats[vote.barangay] = barangay_stats.get(vote.barangay, 0) + 1
+
     for position in CANDIDATES_DATA.keys():
         position_results = {}
         
