@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
 import { User, CheckCircle2, X } from 'lucide-react';
 import { BARANGAYS } from '../constants/barangays';
+import { ThemeToggle } from './ThemeToggle';
 
 const VotingInterface = () => {
   const [step, setStep] = useState(1);
@@ -126,10 +127,12 @@ const VotingInterface = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background">
-        <Card className="w-full max-w-md p-6">
-          <CardContent>
-            <div className="text-center">Loading candidates...</div>
+      <div className="container mx-auto max-w-2xl pt-8">
+        <Card className="w-full">
+          <CardContent className="p-6">
+            <div className="flex justify-center items-center h-40">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -138,19 +141,17 @@ const VotingInterface = () => {
 
   if (error) {
     return (
-      <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-        <Card className="w-full max-w-md p-6 relative">
-          <button
-            onClick={handleCloseError}
-            className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-800/50"
-          >
-            <X className="w-5 h-5 text-gray-400" />
-          </button>
-          <CardContent>
-            <div className="text-center text-red-500 mb-4">{error}</div>
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex justify-center items-center z-50">
+        <Card className="w-full max-w-md mx-4">
+          <CardContent className="p-6 text-center">
+            <div className="mb-4">
+              <X className="h-10 w-10 text-red-500 mx-auto" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Error</h3>
+            <p className="text-muted-foreground mb-4">{error}</p>
             <button
               onClick={handleCloseError}
-              className="w-full bg-gray-600 text-white py-2 rounded-md hover:bg-gray-500 transition"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
             >
               Close
             </button>
@@ -162,14 +163,12 @@ const VotingInterface = () => {
 
   if (success) {
     return (
-      <div className="flex justify-center items-start min-h-screen pt-20">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-6">
-            <div className="text-center space-y-4">
-              <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto" />
-              <h2 className="text-2xl font-semibold text-gray-100">Thank You for Voting!</h2>
-              <p className="text-gray-400">Your vote has been successfully recorded.</p>
-            </div>
+      <div className="container mx-auto max-w-md pt-8">
+        <Card>
+          <CardContent className="p-8 text-center">
+            <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-2">Thank You for Voting!</h2>
+            <p className="text-muted-foreground">Your vote has been successfully recorded.</p>
           </CardContent>
         </Card>
       </div>
@@ -177,105 +176,84 @@ const VotingInterface = () => {
   }
 
   return (
-    <div className="min-h-screen py-4 sm:py-8 px-2 sm:px-4">
-      <Card className="w-full max-w-2xl mx-auto border-gray-800">
+    <div className="container mx-auto max-w-2xl pt-8 px-4">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-center text-xl sm:text-2xl">Election Poll 2025</CardTitle>
+          <CardTitle className="text-center">Cast Your Vote</CardTitle>
         </CardHeader>
-        <CardContent>
-          {error && (
-            <Alert className="mb-4 bg-red-50 border-red-200 text-red-700 relative">
-              <AlertDescription>{error}</AlertDescription>
-              <button
-                onClick={handleCloseError}
-                className="absolute top-2 right-2 p-1 rounded-full hover:bg-red-200/50"
-              >
-                <X className="w-4 h-4 text-red-500" />
-              </button>
-            </Alert>
-          )}
-
+        <CardContent className="p-6">
           {step === 1 ? (
-            <form onSubmit={handleNameSubmit} className="space-y-4">
+            <form onSubmit={handleNameSubmit} className="space-y-6">
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Please enter your name to begin voting
-                  </label>
-                  <div className="flex items-center space-x-2 border border-gray-800 rounded-md p-2 bg-gray-900/50">
-                    <User className="w-5 h-5 text-green-500" />
+                <div>
+                  <label className="block text-sm font-medium mb-2">Full Name</label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
                       type="text"
                       value={voterName}
                       onChange={(e) => setVoterName(e.target.value)}
-                      className="flex-1 outline-none bg-transparent text-gray-100 placeholder-gray-500 w-full"
-                      placeholder="Your full name"
+                      className="w-full pl-10 pr-4 py-2 border rounded-md bg-background"
+                      placeholder="Enter your full name"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Enter your contact number
-                  </label>
-                  <div className="flex items-center space-x-2 border border-gray-800 rounded-md p-2 bg-gray-900/50">
-                    <input
-                      type="tel"
-                      value={contactNumber}
-                      onChange={(e) => setContactNumber(e.target.value)}
-                      className="flex-1 outline-none bg-transparent text-gray-100 placeholder-gray-500 w-full"
-                      placeholder="e.g., 09123456789"
-                      maxLength={11}
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Contact Number</label>
+                  <input
+                    type="tel"
+                    value={contactNumber}
+                    onChange={(e) => setContactNumber(e.target.value)}
+                    className="w-full px-4 py-2 border rounded-md bg-background"
+                    placeholder="e.g., 09123456789"
+                    maxLength={11}
+                  />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Select your barangay
-                  </label>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Barangay</label>
                   <select
                     value={barangay}
                     onChange={(e) => setBarangay(e.target.value)}
-                    className="w-full p-2 rounded-md border border-gray-800 bg-gray-900/50 text-gray-100 outline-none"
+                    className="w-full px-4 py-2 border rounded-md bg-background appearance-none"
                   >
-                    <option value="">Select Barangay</option>
+                    <option value="">Select your barangay</option>
                     {BARANGAYS.map((brgy) => (
-                      <option key={brgy} value={brgy} className="bg-gray-900">
-                        {brgy}
-                      </option>
+                      <option key={brgy} value={brgy}>{brgy}</option>
                     ))}
                   </select>
                 </div>
               </div>
+
               <button
                 type="submit"
-                className="w-full bg-green-600 text-white font-medium py-2 rounded-md hover:bg-green-500 transition"
+                className="w-full bg-primary text-primary-foreground py-2.5 rounded-md hover:opacity-90 transition-opacity font-medium"
               >
                 Continue to Vote
               </button>
             </form>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-8">
               {candidates && Object.entries(candidates).map(([position, data]) => (
-                <div key={position} className="border-b pb-4">
-                  <h3 className="font-medium mb-2 text-base sm:text-lg">
+                <div key={position}>
+                  <h3 className="text-lg font-semibold mb-4">
                     {position}
-                    <span className="text-xs sm:text-sm text-gray-500 ml-2 block sm:inline mt-1 sm:mt-0">
+                    <span className="text-sm font-normal text-muted-foreground ml-2">
                       (Select {position === "MEMBER, SANGGUNIANG PANLUNGSOD" ? "up to 8" : "1"})
                     </span>
                   </h3>
-                  <div className="space-y-2">
+                  <div className="grid gap-2">
                     {data.candidates.map((candidate) => {
                       const isSelected = (votes[position] || []).includes(candidate);
                       return (
                         <button
                           key={candidate}
                           onClick={() => handleVoteChange(position, candidate)}
-                          className={`w-full text-left p-3 rounded transition ${
+                          className={`w-full text-left px-4 py-3 rounded-md transition-colors ${
                             isSelected 
-                              ? 'bg-green-500/20 border-green-500 border text-green-400' 
-                              : 'hover:bg-gray-800/50 border border-gray-800'
+                              ? 'bg-primary/10 border-primary text-primary border-2' 
+                              : 'border border-border hover:bg-muted/50'
                           }`}
                         >
                           {candidate}
@@ -288,7 +266,7 @@ const VotingInterface = () => {
               
               <button
                 onClick={handleSubmit}
-                className="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-500 transition font-medium"
+                className="w-full bg-primary text-primary-foreground py-3 rounded-md hover:opacity-90 transition-opacity font-medium mt-8"
               >
                 Submit Votes
               </button>

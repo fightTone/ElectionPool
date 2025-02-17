@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { BarChart2, Users, MapPin } from 'lucide-react';
 import { BARANGAYS } from '../constants/barangays';
+import { ThemeToggle } from './ThemeToggle';
 
 const COLORS = ['#22c55e', '#15803d', '#166534', '#14532d', '#047857', '#059669', '#10b981', '#34d399'];
 
@@ -55,10 +56,12 @@ const AnalyticsDashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background">
-        <Card className="w-full max-w-md p-6">
-          <CardContent>
-            <div className="text-center">Loading results...</div>
+      <div className="container mx-auto max-w-7xl pt-8">
+        <Card className="w-full">
+          <CardContent className="p-6">
+            <div className="flex justify-center items-center h-40">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -83,41 +86,44 @@ const AnalyticsDashboard = () => {
     // Get candidates data
     const candidateEntries = Object.entries(results.results[position].candidates);
     
-    // Map the data according to the response structure
-    return candidateEntries.map(([name, data]) => ({
-      name: name.split('.')[1]?.trim() || name,  // Handle cases without number prefix
-      votes: data.votes,
-      percentage: data.percentage
-    }))
-    .sort((a, b) => b.votes - a.votes);  // Sort by votes in descending order
+    // Map the data and filter out candidates with zero votes
+    return candidateEntries
+      .filter(([_, data]) => data.votes > 0) // Only include candidates with votes
+      .map(([name, data]) => ({
+        name: name.split('.')[1]?.trim() || name,
+        votes: data.votes,
+        percentage: data.percentage
+      }))
+      .sort((a, b) => b.votes - a.votes);
   };
 
   return (
-    <div className="min-h-screen py-4 sm:py-8 px-2 sm:px-4">
-      <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6">
-        {/* Header Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="container mx-auto max-w-7xl py-8 px-4">
+      <div className="space-y-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <Users className="w-8 h-8 text-green-500" />
-                <div>
-                  <p className="text-sm text-gray-500">Total Votes Cast</p>
-                  <h3 className="text-2xl font-bold">{results?.total_votes || 0}</h3>
-                </div>
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="p-3 bg-primary/10 rounded-full">
+                <Users className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Votes Cast</p>
+                <h3 className="text-2xl font-bold">{results?.total_votes || 0}</h3>
               </div>
             </CardContent>
           </Card>
+
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <BarChart2 className="w-8 h-8 text-green-500" />
-                <div>
-                  <p className="text-sm text-gray-500">Last Updated</p>
-                  <h3 className="text-lg font-medium">
-                    {new Date(results?.last_updated).toLocaleString()}
-                  </h3>
-                </div>
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="p-3 bg-primary/10 rounded-full">
+                <BarChart2 className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Last Updated</p>
+                <h3 className="text-lg font-medium">
+                  {new Date(results?.last_updated).toLocaleString()}
+                </h3>
               </div>
             </CardContent>
           </Card>
@@ -128,32 +134,30 @@ const AnalyticsDashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="w-5 h-5" />
-              Barangay Filter
+              Select Barangay
             </CardTitle>
           </CardHeader>
           <CardContent>
             <select
               value={selectedBarangay}
               onChange={(e) => setSelectedBarangay(e.target.value)}
-              className="w-full p-2 rounded-md border border-gray-800 bg-gray-900/50 text-gray-100 outline-none"
+              className="w-full px-4 py-2 rounded-md border bg-background text-foreground"
             >
               <option value="All">All Barangays</option>
               {BARANGAYS.map((brgy) => (
-                <option key={brgy} value={brgy} className="bg-gray-900">
-                  {brgy}
-                </option>
+                <option key={brgy} value={brgy}>{brgy}</option>
               ))}
             </select>
           </CardContent>
         </Card>
 
-        {/* Barangay Distribution */}
+        {/* Barangay Distribution Pie Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Votes by Barangay</CardTitle>
+            <CardTitle>Vote Distribution by Barangay</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] sm:h-[400px]">
+            <div className="h-[400px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -162,21 +166,28 @@ const AnalyticsDashboard = () => {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    outerRadius={120}
-                    label={({name, percentage}) => `${name} (${percentage.toFixed(1)}%)`}
+                    outerRadius={160}
+                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(1)}%)`}
+                    labelLine={{ stroke: 'hsl(var(--foreground))' }}
                   >
-                    {barangayStats.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {barangayStats.map((_, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={`hsl(${142 + (index * 20)} 70% 45%)`}
+                        stroke="hsl(var(--background))"
+                        strokeWidth={2}
+                      />
                     ))}
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1f2937',
-                      border: '1px solid #374151',
-                      borderRadius: '0.375rem'
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '0.5rem',
+                      color: 'hsl(var(--foreground))'
                     }}
-                    formatter={(value, name, props) => [
-                      `${value} votes (${props.payload.percentage.toFixed(1)}%)`,
+                    formatter={(value, name, entry) => [
+                      `${value} votes (${entry.payload.percentage.toFixed(1)}%)`,
                       name
                     ]}
                   />
@@ -191,20 +202,22 @@ const AnalyticsDashboard = () => {
           <CardHeader>
             <CardTitle>Select Position</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-1 sm:gap-2">
-            {results && Object.keys(results.results).map((position) => (
-              <button
-                key={position}
-                onClick={() => setSelectedPosition(position)}
-                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm ${
-                  selectedPosition === position
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-800 hover:bg-gray-700'
-                }`}
-              >
-                {position}
-              </button>
-            ))}
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {results && Object.keys(results.results).map((position) => (
+                <button
+                  key={position}
+                  onClick={() => setSelectedPosition(position)}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    selectedPosition === position
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                  }`}
+                >
+                  {position}
+                </button>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -214,35 +227,34 @@ const AnalyticsDashboard = () => {
             <CardTitle>{selectedPosition} Results</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] sm:h-[400px]">
+            <div className="h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={prepareChartData(selectedPosition)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" /> {/* Darker grid lines */}
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis 
                     dataKey="name" 
                     angle={-45}
                     textAnchor="end"
                     height={100}
                     interval={0}
-                    stroke="#fff"  // Make axis labels white
-                    fontSize={10}
-                    tick={{ fontSize: 10 }}
+                    stroke="currentColor"
+                    fontSize={12}
+                    tickMargin={8}
                   />
-                  <YAxis stroke="#fff" /> {/* Make axis labels white */}
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1f2937', 
-                      border: '1px solid #374151',
-                      borderRadius: '0.375rem'
+                  <YAxis stroke="currentColor" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '0.5rem',
+                      color: 'hsl(var(--foreground))'
                     }}
-                    labelStyle={{ color: '#e5e7eb' }}
-                    itemStyle={{ color: '#22c55e' }}
-                    formatter={(value, name) => [
-                      name === 'percentage' ? `${value.toFixed(1)}%` : value,
-                      name === 'percentage' ? 'Percentage' : 'Votes'
-                    ]}
                   />
-                  <Bar dataKey="votes" fill="#22c55e" /> {/* Changed to green-500 */}
+                  <Bar 
+                    dataKey="votes" 
+                    fill="hsl(var(--primary))"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -258,23 +270,27 @@ const AnalyticsDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <table className="w-full text-xs sm:text-sm">
+              <table className="w-full">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-4">Candidate</th>
-                    <th className="text-right py-2 sm:py-3 px-2 sm:px-4">Votes</th>
-                    <th className="text-right py-2 sm:py-3 px-2 sm:px-4">Percentage</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Candidate</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Votes</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Percentage</th>
                   </tr>
                 </thead>
                 <tbody>
                   {results?.results[selectedPosition]?.candidates && 
                     Object.entries(results.results[selectedPosition].candidates)
+                      .filter(([_, data]) => data.votes > 0)
                       .sort((a, b) => b[1].votes - a[1].votes)
                       .map(([candidate, data]) => (
-                        <tr key={candidate} className="border-b border-gray-800 hover:bg-gray-800/50">
+                        <tr 
+                          key={candidate} 
+                          className="border-b border-border transition-colors hover:bg-muted/50"
+                        >
                           <td className="py-3 px-4">{candidate}</td>
                           <td className="text-right py-3 px-4">{data.votes}</td>
-                          <td className="text-right py-3 px-4">
+                          <td className="text-right py-3 px-4 text-muted-foreground">
                             {data.percentage.toFixed(1)}%
                           </td>
                         </tr>
