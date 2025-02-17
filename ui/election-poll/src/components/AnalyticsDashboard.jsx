@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { BarChart2, Users, MapPin } from 'lucide-react';
 import { BARANGAYS } from '../constants/barangays';
 import { ThemeToggle } from './ThemeToggle';
+import { motion } from 'framer-motion';
 
 const COLORS = ['#22c55e', '#15803d', '#166534', '#14532d', '#047857', '#059669', '#10b981', '#34d399'];
 
@@ -98,36 +99,67 @@ const AnalyticsDashboard = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-7xl py-8 px-4">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="container mx-auto max-w-7xl py-8 px-4 relative z-0" // Add relative and z-0
+    >
       <div className="space-y-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="p-3 bg-primary/10 rounded-full">
-                <Users className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Votes Cast</p>
-                <h3 className="text-2xl font-bold">{results?.total_votes || 0}</h3>
-              </div>
-            </CardContent>
-          </Card>
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          variants={{
+            hidden: { opacity: 0 },
+            show: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.2
+              }
+            }
+          }}
+          initial="hidden"
+          animate="show"
+        >
+          {/* Stats Cards */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              show: { opacity: 1, y: 0 }
+            }}
+          >
+            <Card>
+              <CardContent className="flex items-center gap-4 p-6">
+                <div className="p-3 bg-primary/10 rounded-full">
+                  <Users className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Votes Cast</p>
+                  <h3 className="text-2xl font-bold">{results?.total_votes || 0}</h3>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-          <Card>
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="p-3 bg-primary/10 rounded-full">
-                <BarChart2 className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Last Updated</p>
-                <h3 className="text-lg font-medium">
-                  {new Date(results?.last_updated).toLocaleString()}
-                </h3>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              show: { opacity: 1, y: 0 }
+            }}
+          >
+            <Card>
+              <CardContent className="flex items-center gap-4 p-6">
+                <div className="p-3 bg-primary/10 rounded-full">
+                  <BarChart2 className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Last Updated</p>
+                  <h3 className="text-lg font-medium">
+                    {new Date(results?.last_updated).toLocaleString()}
+                  </h3>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </motion.div>
 
         {/* Barangay Filter */}
         <Card>
@@ -156,7 +188,7 @@ const AnalyticsDashboard = () => {
           <CardHeader>
             <CardTitle>Vote Distribution by Barangay</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative z-10"> {/* Add relative and z-10 */}
             <div className="h-[400px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -302,7 +334,7 @@ const AnalyticsDashboard = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

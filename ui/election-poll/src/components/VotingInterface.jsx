@@ -4,6 +4,7 @@ import { Alert, AlertDescription } from './ui/alert';
 import { User, CheckCircle2, X } from 'lucide-react';
 import { BARANGAYS } from '../constants/barangays';
 import { ThemeToggle } from './ThemeToggle';
+import { motion } from 'framer-motion';
 
 const VotingInterface = () => {
   const [step, setStep] = useState(1);
@@ -181,14 +182,31 @@ const VotingInterface = () => {
   }
 
   return (
-    <div className="container mx-auto max-w-2xl pt-8 px-4">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="container mx-auto max-w-2xl pt-8 px-4"
+    >
       <Card>
         <CardHeader>
-          <CardTitle className="text-center">Cast Your Vote</CardTitle>
+          <motion.div
+            initial={{ scale: 0.95 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <CardTitle className="text-center">Cast Your Vote</CardTitle>
+          </motion.div>
         </CardHeader>
         <CardContent className="p-6">
           {step === 1 ? (
-            <form onSubmit={handleNameSubmit} className="space-y-6">
+            <motion.form 
+              onSubmit={handleNameSubmit} 
+              className="space-y-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">Full Name</label>
@@ -258,9 +276,11 @@ const VotingInterface = () => {
                 </label>
               </div>
 
-              <button
+              <motion.button
                 type="submit"
                 disabled={!hasAgreed}
+                whileHover={{ scale: hasAgreed ? 1.02 : 1 }}
+                whileTap={{ scale: hasAgreed ? 0.98 : 1 }}
                 className={`w-full py-2.5 rounded-md font-medium transition-all ${
                   hasAgreed 
                     ? 'bg-primary text-primary-foreground hover:opacity-90' 
@@ -268,10 +288,15 @@ const VotingInterface = () => {
                 }`}
               >
                 Continue to Vote
-              </button>
-            </form>
+              </motion.button>
+            </motion.form>
           ) : (
-            <div className="space-y-8">
+            <motion.div 
+              className="space-y-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
               {candidates && Object.entries(candidates).map(([position, data]) => (
                 <div key={position}>
                   <h3 className="text-lg font-semibold mb-4">
@@ -307,11 +332,11 @@ const VotingInterface = () => {
               >
                 Submit Votes
               </button>
-            </div>
+            </motion.div>
           )}
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 };
 
