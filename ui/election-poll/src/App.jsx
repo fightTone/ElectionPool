@@ -4,6 +4,7 @@ import AnalyticsDashboard from './components/AnalyticsDashboard';
 import VotingInterface from './components/VotingInterface';
 import { useTheme } from './contexts/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 // Separate NavigationBar into a component that will be used inside Router
 function NavigationBar() {
@@ -69,6 +70,7 @@ function AnimatedRoutes() {
         <Routes>
           <Route path="/" element={<VotingInterface />} />
           <Route path="/analytics" element={<AnalyticsDashboard />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         </Routes>
       </motion.main>
     </AnimatePresence>

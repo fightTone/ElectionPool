@@ -213,15 +213,30 @@ const AnalyticsDashboard = () => {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
+                      backgroundColor: 'hsl(var(--background))',
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '0.5rem',
-                      color: 'hsl(var(--foreground))'
+                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                      padding: '8px 12px'
+                    }}
+                    itemStyle={{
+                      color: 'hsl(var(--foreground))',
+                      fontSize: '14px',
+                      padding: '2px 0'
                     }}
                     formatter={(value, name, entry) => [
                       `${value} votes (${entry.payload.percentage.toFixed(1)}%)`,
                       name
                     ]}
+                    labelStyle={{
+                      color: 'hsl(var(--foreground))',
+                      fontWeight: 'bold',
+                      marginBottom: '4px'
+                    }}
+                    wrapperStyle={{
+                      zIndex: 20,
+                      outline: 'none'
+                    }}
                   />
                 </PieChart>
               </ResponsiveContainer>

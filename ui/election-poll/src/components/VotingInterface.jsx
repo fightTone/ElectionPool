@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // Add this import
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
 import { User, CheckCircle2, X } from 'lucide-react';
@@ -262,6 +263,14 @@ const VotingInterface = () => {
                     <li>Your personal data will be handled securely and confidentially</li>
                     <li>Your voting choices will remain anonymous in the results</li>
                   </ul>
+                  <Link 
+                    to="/privacy-policy"
+                    className="text-sm text-primary hover:underline block mt-4"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Read full Privacy Policy
+                  </Link>
                 </div>
                 <label className="flex items-center space-x-2">
                   <input
@@ -271,7 +280,7 @@ const VotingInterface = () => {
                     className="rounded border-border text-primary focus:ring-primary"
                   />
                   <span className="text-sm">
-                    I agree to the data privacy terms and consent to the processing of my information
+                    I have read and agree to the Privacy Policy and consent to the processing of my information
                   </span>
                 </label>
               </div>
