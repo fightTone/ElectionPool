@@ -15,6 +15,7 @@ const VotingInterface = () => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
   const [barangay, setBarangay] = useState('');
+  const [hasAgreed, setHasAgreed] = useState(false);
 
   useEffect(() => {
     // Fetch candidates when component mounts
@@ -56,6 +57,10 @@ const VotingInterface = () => {
     }
     if (!barangay) {
       setError('Please select your barangay');
+      return;
+    }
+    if (!hasAgreed) {
+      setError('Please accept the data privacy agreement to continue');
       return;
     }
 
@@ -226,9 +231,41 @@ const VotingInterface = () => {
                 </div>
               </div>
 
+              {/* Add Privacy Agreement Section */}
+              <div className="space-y-4 rounded-lg border border-border p-4 bg-muted/20">
+                <div className="prose prose-sm dark:prose-invert">
+                  <h4 className="text-sm font-semibold mb-2">Data Privacy Agreement</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    By proceeding, you agree that:
+                  </p>
+                  <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
+                    <li>Your provided information will be used solely for vote verification purposes</li>
+                    <li>Your contact number will be used only to prevent duplicate voting</li>
+                    <li>Your personal data will be handled securely and confidentially</li>
+                    <li>Your voting choices will remain anonymous in the results</li>
+                  </ul>
+                </div>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={hasAgreed}
+                    onChange={(e) => setHasAgreed(e.target.checked)}
+                    className="rounded border-border text-primary focus:ring-primary"
+                  />
+                  <span className="text-sm">
+                    I agree to the data privacy terms and consent to the processing of my information
+                  </span>
+                </label>
+              </div>
+
               <button
                 type="submit"
-                className="w-full bg-primary text-primary-foreground py-2.5 rounded-md hover:opacity-90 transition-opacity font-medium"
+                disabled={!hasAgreed}
+                className={`w-full py-2.5 rounded-md font-medium transition-all ${
+                  hasAgreed 
+                    ? 'bg-primary text-primary-foreground hover:opacity-90' 
+                    : 'bg-muted text-muted-foreground cursor-not-allowed'
+                }`}
               >
                 Continue to Vote
               </button>
