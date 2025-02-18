@@ -5,6 +5,7 @@ import { BarChart2, Users, MapPin } from 'lucide-react';
 import { BARANGAYS } from '../constants/barangays';
 import { ThemeToggle } from './ThemeToggle';
 import { motion } from 'framer-motion';
+import { API_BASE_URL } from '../config/api';
 
 const COLORS = ['#22c55e', '#15803d', '#166534', '#14532d', '#047857', '#059669', '#10b981', '#34d399'];
 
@@ -29,8 +30,8 @@ const AnalyticsDashboard = () => {
     const fetchData = async () => {
       try {
         const url = selectedBarangay === 'All' 
-          ? 'http://3.84.6.19:8080/api/results/live'
-          : `http://3.84.6.19:8080/api/results/barangay/${selectedBarangay}`;
+          ? `${API_BASE_URL}/results/live`
+          : `${API_BASE_URL}/results/barangay/${selectedBarangay}`;
         
         const response = await fetch(url);
         const data = await response.json();

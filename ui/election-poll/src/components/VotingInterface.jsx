@@ -6,6 +6,7 @@ import { User, CheckCircle2, X } from 'lucide-react';
 import { BARANGAYS } from '../constants/barangays';
 import { ThemeToggle } from './ThemeToggle';
 import { motion } from 'framer-motion';
+import { API_BASE_URL } from '../config/api';
 
 const VotingInterface = () => {
   const [step, setStep] = useState(1);
@@ -22,7 +23,7 @@ const VotingInterface = () => {
 
   useEffect(() => {
     // Fetch candidates when component mounts
-    fetch('http://3.84.6.19:8080/api/candidates')
+    fetch(`${API_BASE_URL}/candidates`)
       .then(res => res.json())
       .then(data => {
         setCandidates(data);
@@ -36,7 +37,7 @@ const VotingInterface = () => {
 
   const checkContactNumber = async (number) => {
     try {
-      const response = await fetch(`http://3.84.6.19:8080/api/check-contact/${number}`);
+      const response = await fetch(`${API_BASE_URL}/check-contact/${number}`);
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.detail);
@@ -99,7 +100,7 @@ const VotingInterface = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('http://3.84.6.19:8080/api/submit-vote', {
+      const response = await fetch(`${API_BASE_URL}/submit-vote`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
