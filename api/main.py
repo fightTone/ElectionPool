@@ -8,6 +8,7 @@ from pydantic import BaseModel, field_validator
 import os
 from dotenv import load_dotenv
 import json
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 # Add BARANGAYS list after imports
 BARANGAYS = [
@@ -66,8 +67,13 @@ class Vote(Base):
     votes = Column(JSON)
     timestamp = Column(DateTime, default=datetime.utcnow)
 
-# Create tables
-Base.metadata.create_all(bind=engine)
+# Add retry logic for database connection
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=4, max=10)
+)
+def init_db():
+    Base.metadata.create_all(bind=engine)
 
 # Pydantic Models
 class VoteCreate(BaseModel):
@@ -344,13 +350,13 @@ async def get_barangay_results(barangay: str, db: Session = Depends(get_db)):
 async def health_check():
     return {"status": "healthy"}
 
+# Update the startup code
 if __name__ == "__main__":
-    import uvicorn
-    port = int(os.getenv('PORT', 80))
-    host = "0.0.0.0" if os.getenv('ENVIRONMENT') == 'production' else "127.0.0.1"
-    uvicorn.run(
-        "main:app", 
-        host=host, 
-        port=port, 
-        reload=os.getenv('ENVIRONMENT') != 'production'
-    )
+    try:
+        init_db()  # Initialize database with retry logic
+        port = int(os.getenv('PORT', 80))
+        host = "0.0.0.0" if os.getenv('ENVIRONMENT') == 'production' else "127.0.0.1"
+        uvicorn.run("main:app", host=host, port=port, reload=os.getenv('ENVIRONMENT') != 'production')
+    except Exception as e:
+        print(f"Failed to initialize database: {e}")
+        raise
