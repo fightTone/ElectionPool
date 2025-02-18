@@ -14,33 +14,18 @@ services:
       - DB_NAME=${DB_NAME}
       - SECRET_KEY=${SECRET_KEY}
       - ENVIRONMENT=production
-    depends_on:
-      db:
-        condition: service_healthy
     deploy:
       resources:
         limits:
           cpus: '1'
           memory: 1G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
     extra_hosts:
-      - "host.docker.internal:host-gateway"
-    volumes:
-      - ./:/app
-    networks:
-      - app_network
+      - "host.docker.internal:host-gateway"  # Important for connecting to host MySQL
 
   db:
     image: mysql:8.0
