@@ -93,18 +93,31 @@ const AnalyticsDashboard = () => {
   const prepareChartData = (position) => {
     if (!results?.results[position]?.candidates) return [];
     
-    // Get candidates data
     const candidateEntries = Object.entries(results.results[position].candidates);
-    
-    // Map the data and filter out candidates with zero votes
-    return candidateEntries
-      .filter(([_, data]) => data.votes > 0) // Only include candidates with votes
+    const filteredEntries = candidateEntries
+      .filter(([_, data]) => data.votes > 0)
       .map(([name, data]) => ({
         name: name.split('.')[1]?.trim() || name,
         votes: data.votes,
         percentage: data.percentage
       }))
       .sort((a, b) => b.votes - a.votes);
+
+    // Find the maximum votes to calculate color intensity
+    const maxVotes = Math.max(...filteredEntries.map(entry => entry.votes));
+
+    // Create a gradient from dark blue to light green based on vote percentage
+    return filteredEntries.map(entry => ({
+      ...entry,
+      fill: `hsl(${200 + ((entry.votes / maxVotes) * (142 - 200))}, ${
+        70 + ((1 - entry.votes / maxVotes) * 20)
+      }%, ${
+        35 + ((1 - entry.votes / maxVotes) * 25)
+      }%)`
+      // This creates:
+      // Highest votes: hsl(200, 70%, 35%) - Dark Blue
+      // Lowest votes: hsl(142, 90%, 60%) - Light Green
+    }));
   };
 
   return (
@@ -265,60 +278,109 @@ const AnalyticsDashboard = () => {
                 <CardTitle className="text-sm sm:text-base">Select Position</CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-4">
-                <div className="flex flex-wrap gap-2">
+                <select
+                  value={selectedPosition}
+                  onChange={(e) => setSelectedPosition(e.target.value)}
+                  className="w-full px-4 py-2 rounded-md border bg-background text-foreground"
+                >
                   {results && Object.keys(results.results).map((position) => (
-                    <button
-                      key={position}
-                      onClick={() => setSelectedPosition(position)}
-                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        selectedPosition === position
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                      }`}
-                    >
+                    <option key={position} value={position}>
                       {position}
-                    </button>
+                    </option>
                   ))}
-                </div>
+                </select>
               </CardContent>
             </Card>
 
             {/* Results Chart */}
             <Card>
               <CardHeader className="p-3 sm:p-4">
-                <CardTitle className="text-sm sm:text-base">{selectedPosition} Results</CardTitle>
+                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                  {selectedPosition} Results
+                  <span className="text-xs text-muted-foreground font-normal">
+                    (Scroll horizontally to see more →)
+                  </span>
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-4">
-                <div className="h-[300px] sm:h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={prepareChartData(selectedPosition)}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                      <XAxis 
-                        dataKey="name" 
-                        angle={-45}
-                        textAnchor="end"
-                        height={100}
-                        interval={0}
-                        stroke="currentColor"
-                        fontSize={12}
-                        tickMargin={8}
-                      />
-                      <YAxis stroke="currentColor" />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '0.5rem',
-                          color: 'hsl(var(--foreground))'
-                        }}
-                      />
-                      <Bar 
-                        dataKey="votes" 
-                        fill="hsl(var(--primary))"
-                        radius={[4, 4, 0, 0]}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
+                <div className="relative w-full">
+                  <div className="w-full overflow-x-auto">
+                    <div className="h-[300px] sm:h-[400px]" style={{ minWidth: '600px' }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart 
+                          data={prepareChartData(selectedPosition)}
+                          margin={{ top: 5, right: 30, left: 20, bottom: 70 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                          <XAxis 
+                            dataKey="name"
+                            angle={-45}
+                            textAnchor="end"
+                            height={70}
+                            interval={0}
+                            stroke="currentColor"
+                            fontSize={12}
+                            tickMargin={8}
+                          />
+                          <YAxis stroke="currentColor" />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: 'hsl(var(--background))',
+                              border: '1px solid hsl(var(--border))',
+                              borderRadius: '0.5rem',
+                              color: 'hsl(var(--foreground))',
+                              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
+                              padding: '8px 12px',
+                              fontSize: '0.875rem'
+                            }}
+                            formatter={(value, name, props) => [
+                              `${value} votes (${props.payload.percentage.toFixed(1)}%)`,
+                              props.payload.name
+                            ]}
+                            labelStyle={{
+                              color: 'hsl(var(--foreground))',
+                              fontWeight: 'bold',
+                              marginBottom: '4px'
+                            }}
+                            itemStyle={{
+                              color: 'hsl(var(--foreground))',
+                              padding: '2px 0'
+                            }}
+                            cursor={{ fill: 'hsl(var(--muted))' }}
+                          />
+                          <Bar 
+                            dataKey="votes" 
+                            radius={[4, 4, 0, 0]}
+                          >
+                            {prepareChartData(selectedPosition).map((entry, index) => (
+                              <Cell 
+                                key={`cell-${index}`} 
+                                fill={entry.fill}
+                                stroke="hsl(var(--background))"
+                                strokeWidth={1}
+                              />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                  {/* Add shadow and arrow indicators for scroll */}
+                  <div className="absolute top-0 right-0 bottom-0 w-8 pointer-events-none bg-gradient-to-l from-background via-background/50 to-transparent" />
+                  <div className="absolute top-0 right-8 bottom-0 flex items-center pointer-events-none opacity-50">
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ 
+                        repeat: Infinity, 
+                        duration: 1.5,
+                        repeatType: "reverse" 
+                      }}
+                      className="text-muted-foreground"
+                    >
+                      →
+                    </motion.div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -326,40 +388,71 @@ const AnalyticsDashboard = () => {
             {/* Detailed Results Table */}
             <Card>
               <CardHeader className="p-3 sm:p-4">
-                <CardTitle className="text-sm sm:text-base">
+                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                   Detailed Results {selectedBarangay !== 'All' ? `- ${selectedBarangay}` : ''}
+                  <span className="text-xs text-muted-foreground font-normal">
+                    (Scroll horizontally to see more →)
+                  </span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-4">
-                <div className="overflow-x-auto -mx-3 sm:mx-0">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Candidate</th>
-                        <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Votes</th>
-                        <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Percentage</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {results?.results[selectedPosition]?.candidates && 
-                        Object.entries(results.results[selectedPosition].candidates)
-                          .filter(([_, data]) => data.votes > 0)
-                          .sort((a, b) => b[1].votes - a[1].votes)
-                          .map(([candidate, data]) => (
-                            <tr 
-                              key={candidate} 
-                              className="border-b border-border transition-colors hover:bg-muted/50"
-                            >
-                              <td className="py-3 px-4">{candidate}</td>
-                              <td className="text-right py-3 px-4">{data.votes}</td>
-                              <td className="text-right py-3 px-4 text-muted-foreground">
-                                {data.percentage.toFixed(1)}%
-                              </td>
-                            </tr>
-                          ))
-                      }
-                    </tbody>
-                  </table>
+                <div className="relative w-full">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="sticky left-0 bg-background text-left py-2 px-3 text-xs sm:text-sm font-medium text-muted-foreground min-w-[200px] z-20 after:absolute after:top-0 after:right-0 after:bottom-0 after:w-4 after:shadow-[4px_0_6px_-1px_rgba(0,0,0,0.15)] after:pointer-events-none dark:after:shadow-[4px_0_6px_-1px_rgba(0,0,0,0.4)]">
+                            Candidate
+                          </th>
+                          <th className="text-right py-2 px-3 text-xs sm:text-sm font-medium text-muted-foreground min-w-[100px]">
+                            Votes
+                          </th>
+                          <th className="text-right py-2 px-3 text-xs sm:text-sm font-medium text-muted-foreground min-w-[100px]">
+                            Percentage
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {results?.results[selectedPosition]?.candidates && 
+                          Object.entries(results.results[selectedPosition].candidates)
+                            .filter(([_, data]) => data.votes > 0)
+                            .sort((a, b) => b[1].votes - a[1].votes)
+                            .map(([candidate, data]) => (
+                              <tr 
+                                key={candidate} 
+                                className="border-b border-border transition-colors hover:bg-muted/50"
+                              >
+                                <td className="sticky left-0 bg-background py-2 px-3 text-xs sm:text-sm z-10 after:absolute after:top-0 after:right-0 after:bottom-0 after:w-4 after:shadow-[4px_0_6px_-1px_rgba(0,0,0,0.15)] after:pointer-events-none dark:after:shadow-[4px_0_6px_-1px_rgba(0,0,0,0.4)]">
+                                  {candidate}
+                                </td>
+                                <td className="text-right py-2 px-3 text-xs sm:text-sm">
+                                  {data.votes}
+                                </td>
+                                <td className="text-right py-2 px-3 text-xs sm:text-sm text-muted-foreground">
+                                  {data.percentage.toFixed(1)}%
+                                </td>
+                              </tr>
+                            ))
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                  {/* Enhanced shadow indicators for scroll */}
+                  <div className="absolute top-0 right-0 bottom-0 w-8 pointer-events-none bg-gradient-to-l from-background via-background/50 to-transparent" />
+                  <div className="absolute top-0 right-8 bottom-0 flex items-center pointer-events-none opacity-50">
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ 
+                        repeat: Infinity, 
+                        duration: 1.5,
+                        repeatType: "reverse" 
+                      }}
+                      className="text-muted-foreground"
+                    >
+                      →
+                    </motion.div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

@@ -279,169 +279,172 @@ const VotingInterface = () => {
   }
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="container mx-auto max-w-2xl pt-8 px-4"
-    >
-      <Card>
-        <CardHeader>
-          <motion.div
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <CardTitle className="text-center">Cast Your Vote</CardTitle>
-          </motion.div>
-        </CardHeader>
-        <CardContent className="p-6">
-          {step === 1 ? (
-            <motion.form 
-              onSubmit={handleNameSubmit} 
-              className="space-y-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Full Name</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input
-                      type="text"
-                      value={voterName}
-                      onChange={(e) => setVoterName(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border rounded-md bg-background"
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Contact Number</label>
-                  <input
-                    type="tel"
-                    value={contactNumber}
-                    onChange={(e) => setContactNumber(e.target.value)}
-                    className="w-full px-4 py-2 border rounded-md bg-background"
-                    placeholder="e.g., 09123456789"
-                    maxLength={11}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Barangay</label>
-                  <select
-                    value={barangay}
-                    onChange={(e) => setBarangay(e.target.value)}
-                    className="w-full px-4 py-2 border rounded-md bg-background appearance-none"
+    <div className="min-h-screen bg-background">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="w-full mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6"
+      >
+        <div className="max-w-3xl mx-auto">
+          <Card className="mx-auto">
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-base sm:text-lg text-center">Cast Your Vote</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6">
+              <div className="max-w-2xl mx-auto">
+                {step === 1 ? (
+                  <motion.form 
+                    onSubmit={handleNameSubmit} 
+                    className="space-y-6"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                   >
-                    <option value="">Select your barangay</option>
-                    {BARANGAYS.map((brgy) => (
-                      <option key={brgy} value={brgy}>{brgy}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+                    {/* Form fields with improved spacing */}
+                    <div className="space-y-4 sm:space-y-6">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Full Name</label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <input
+                            type="text"
+                            value={voterName}
+                            onChange={(e) => setVoterName(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 border rounded-md bg-background"
+                            placeholder="Enter your full name"
+                          />
+                        </div>
+                      </div>
 
-              {/* Add Privacy Agreement Section */}
-              <div className="space-y-4 rounded-lg border border-border p-4 bg-muted/20">
-                <div className="prose prose-sm dark:prose-invert">
-                  <h4 className="text-sm font-semibold mb-2">Data Privacy Agreement</h4>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    By proceeding, you agree that:
-                  </p>
-                  <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
-                    <li>Your provided information will be used solely for vote verification purposes</li>
-                    <li>Your contact number will be used only to prevent duplicate voting</li>
-                    <li>Your personal data will be handled securely and confidentially</li>
-                    <li>Your voting choices will remain anonymous in the results</li>
-                  </ul>
-                  <Link 
-                    to="/privacy-policy"
-                    className="text-sm text-primary hover:underline block mt-4"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Read full Privacy Policy
-                  </Link>
-                </div>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={hasAgreed}
-                    onChange={(e) => setHasAgreed(e.target.checked)}
-                    className="rounded border-border text-primary focus:ring-primary"
-                  />
-                  <span className="text-sm">
-                    I have read and agree to the Privacy Policy and consent to the processing of my information
-                  </span>
-                </label>
-              </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Contact Number</label>
+                        <input
+                          type="tel"
+                          value={contactNumber}
+                          onChange={(e) => setContactNumber(e.target.value)}
+                          className="w-full px-4 py-2 border rounded-md bg-background"
+                          placeholder="e.g., 09123456789"
+                          maxLength={11}
+                        />
+                      </div>
 
-              <motion.button
-                type="submit"
-                disabled={!hasAgreed}
-                whileHover={{ scale: hasAgreed ? 1.02 : 1 }}
-                whileTap={{ scale: hasAgreed ? 0.98 : 1 }}
-                className={`w-full py-2.5 rounded-md font-medium transition-all ${
-                  hasAgreed 
-                    ? 'bg-primary text-primary-foreground hover:opacity-90' 
-                    : 'bg-muted text-muted-foreground cursor-not-allowed'
-                }`}
-              >
-                Continue to Vote
-              </motion.button>
-            </motion.form>
-          ) : (
-            <motion.div 
-              className="space-y-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              {candidates && Object.entries(candidates).map(([position, data]) => (
-                <div key={position}>
-                  <h3 className="text-lg font-semibold mb-4">
-                    {position}
-                    <span className="text-sm font-normal text-muted-foreground ml-2">
-                      (Select {position === "MEMBER, SANGGUNIANG PANLUNGSOD" ? "up to 8" : "1"})
-                    </span>
-                  </h3>
-                  <div className="grid gap-2">
-                    {data.candidates.map((candidate) => {
-                      const isSelected = (votes[position] || []).includes(candidate);
-                      return (
-                        <button
-                          key={candidate}
-                          onClick={() => handleVoteChange(position, candidate)}
-                          className={`w-full text-left px-4 py-3 rounded-md transition-colors ${
-                            isSelected 
-                              ? 'bg-primary/10 border-primary text-primary border-2' 
-                              : 'border border-border hover:bg-muted/50'
-                          }`}
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Barangay</label>
+                        <select
+                          value={barangay}
+                          onChange={(e) => setBarangay(e.target.value)}
+                          className="w-full px-4 py-2 border rounded-md bg-background appearance-none"
                         >
-                          {candidate}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-              
-              <button
-                onClick={handleReviewSubmit}
-                className="w-full bg-primary text-primary-foreground py-3 rounded-md hover:opacity-90 transition-opacity font-medium mt-8"
-              >
-                Review & Submit Votes
-              </button>
-            </motion.div>
-          )}
-        </CardContent>
-      </Card>
-    </motion.div>
+                          <option value="">Select your barangay</option>
+                          {BARANGAYS.map((brgy) => (
+                            <option key={brgy} value={brgy}>{brgy}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Privacy Agreement with better alignment */}
+                    <div className="space-y-4 rounded-lg border border-border p-4 sm:p-6 bg-muted/20">
+                      <div className="prose prose-sm dark:prose-invert max-w-none">
+                        <h4 className="text-sm font-semibold mb-2">Data Privacy Agreement</h4>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          By proceeding, you agree that:
+                        </p>
+                        <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
+                          <li>Your provided information will be used solely for vote verification purposes</li>
+                          <li>Your contact number will be used only to prevent duplicate voting</li>
+                          <li>Your personal data will be handled securely and confidentially</li>
+                          <li>Your voting choices will remain anonymous in the results</li>
+                        </ul>
+                        <Link 
+                          to="/privacy-policy"
+                          className="text-sm text-primary hover:underline block mt-4"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Read full Privacy Policy
+                        </Link>
+                      </div>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={hasAgreed}
+                          onChange={(e) => setHasAgreed(e.target.checked)}
+                          className="rounded border-border text-primary focus:ring-primary"
+                        />
+                        <span className="text-sm">
+                          I have read and agree to the Privacy Policy and consent to the processing of my information
+                        </span>
+                      </label>
+                    </div>
+
+                    {/* Continue button */}
+                    <div className="flex justify-center pt-4">
+                      <motion.button
+                        type="submit"
+                        disabled={!hasAgreed}
+                        className={`w-full sm:w-2/3 py-2.5 rounded-md font-medium transition-all ${
+                          hasAgreed 
+                            ? 'bg-primary text-primary-foreground hover:opacity-90' 
+                            : 'bg-muted text-muted-foreground cursor-not-allowed'
+                        }`}
+                      >
+                        Continue to Vote
+                      </motion.button>
+                    </div>
+                  </motion.form>
+                ) : (
+                  <motion.div 
+                    className="space-y-8"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    {/* Voting options with improved layout */}
+                    {candidates && Object.entries(candidates).map(([position, data]) => (
+                      <div key={position} className="space-y-4">
+                        <h3 className="text-lg font-semibold">
+                          {position}
+                          <span className="text-sm font-normal text-muted-foreground block sm:inline sm:ml-2">
+                            (Select {position === "MEMBER, SANGGUNIANG PANLUNGSOD" ? "up to 8" : "1"})
+                          </span>
+                        </h3>
+                        <div className="grid gap-2">
+                          {data.candidates.map((candidate) => {
+                            const isSelected = (votes[position] || []).includes(candidate);
+                            return (
+                              <button
+                                key={candidate}
+                                onClick={() => handleVoteChange(position, candidate)}
+                                className={`w-full text-left px-4 py-3 rounded-md transition-colors ${
+                                  isSelected 
+                                    ? 'bg-primary/10 border-primary text-primary border-2' 
+                                    : 'border border-border hover:bg-muted/50'
+                                }`}
+                              >
+                                {candidate}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Submit button */}
+                    <div className="flex justify-center pt-6">
+                      <button
+                        onClick={handleReviewSubmit}
+                        className="w-full sm:w-2/3 bg-primary text-primary-foreground py-3 rounded-md hover:opacity-90 transition-opacity font-medium mt-8"
+                      >
+                        Review & Submit Votes
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 
