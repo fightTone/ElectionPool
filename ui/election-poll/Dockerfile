@@ -1,19 +1,25 @@
-FROM node:18-alpine
+FROM node:18-alpine as builder
 
 WORKDIR /app
 
-# Install necessary packages including SSH
-RUN apk add --no-cache bash openssh-client
+# Install essential packages
+RUN apk add --no-cache bash
 
-# Copy your application files
+# Copy and install dependencies
 COPY package*.json ./
 RUN npm install
+
+# Copy and build app
 COPY . .
+RUN npm run build
 
-# Create .ssh directory
-RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh
+# Production stage
+FROM nginx:alpine
 
-EXPOSE 3000
+# Copy built files and nginx config
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Keep container running
-CMD ["tail", "-f", "/dev/null"]
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

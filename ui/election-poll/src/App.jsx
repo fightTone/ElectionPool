@@ -17,12 +17,12 @@ function NavigationBar() {
       animate={{ y: 0 }}
       className="fixed top-0 left-0 right-0 backdrop-blur-none bg-background border-b border-border shadow-sm z-50"
     >
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <h1 className="text-2xl font-bold text-foreground">2025 Election Poll</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">2025 Election Poll</h1>
           
           {/* Center Navigation */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4 sm:gap-8">
             <div className="flex space-x-1 bg-muted/50 p-1 rounded-lg">
               <Link 
                 to="/"

@@ -3,13 +3,14 @@ version: '3.8'
 services:
   frontend:
     container_name: election-poll-ui
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "80:80"
     environment:
+      - NODE_ENV=production
       - VITE_API_URL=http://3.84.6.19:8080
-    networks:
-      - election-network
     stdin_open: true
     tty: true
     restart: unless-stopped
