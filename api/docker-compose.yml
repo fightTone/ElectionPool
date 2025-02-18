@@ -26,28 +26,3 @@ services:
       retries: 3
     extra_hosts:
       - "host.docker.internal:host-gateway"  # Important for connecting to host MySQL
-
-  db:
-    image: mysql:8.0
-    restart: always
-    environment:
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${DB_NAME}
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - app_network
-
-volumes:
-  mysql_data:
-
-networks:
-  app_network:
-    driver: bridge
