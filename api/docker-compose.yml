@@ -14,6 +14,7 @@ services:
       - DB_NAME=${DB_NAME}
       - SECRET_KEY=${SECRET_KEY}
       - ENVIRONMENT=production
+    network_mode: "bridge"  # Use bridge network to access host
     deploy:
       resources:
         limits:
@@ -24,5 +25,3 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    extra_hosts:
-      - "host.docker.internal:host-gateway"  # Important for connecting to host MySQL
