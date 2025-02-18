@@ -18,6 +18,7 @@ const VotingInterface = () => {
   const [loading, setLoading] = useState(true);
   const [barangay, setBarangay] = useState('');
   const [hasAgreed, setHasAgreed] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   useEffect(() => {
     // Fetch candidates when component mounts
@@ -132,6 +133,19 @@ const VotingInterface = () => {
     setError('');
   };
 
+  const handleReviewSubmit = () => {
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmVote = async () => {
+    await handleSubmit();
+    setShowConfirmation(false);
+  };
+
+  const handleEditVotes = () => {
+    setShowConfirmation(false);
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto max-w-2xl pt-8">
@@ -179,6 +193,88 @@ const VotingInterface = () => {
           </CardContent>
         </Card>
       </div>
+    );
+  }
+
+  if (showConfirmation) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="container mx-auto max-w-2xl pt-8 px-4"
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-center">Review Your Votes</CardTitle>
+            <p className="text-center text-muted-foreground mt-2">
+              Please review your selections before final submission
+            </p>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="space-y-6">
+              {/* Voter Information */}
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <h3 className="font-medium mb-2">Voter Information</h3>
+                <dl className="space-y-1">
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Name:</dt>
+                    <dd className="font-medium">{voterName}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Contact:</dt>
+                    <dd className="font-medium">{contactNumber}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Barangay:</dt>
+                    <dd className="font-medium">{barangay}</dd>
+                  </div>
+                </dl>
+              </div>
+
+              {/* Selected Candidates */}
+              <div className="space-y-4">
+                <h3 className="font-medium">Selected Candidates</h3>
+                {Object.entries(candidates).map(([position, data]) => (
+                  <div key={position} className="border rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-muted-foreground mb-2">{position}</h4>
+                    {votes[position]?.length > 0 ? (
+                      <ul className="space-y-1">
+                        {votes[position].map((candidate) => (
+                          <li 
+                            key={candidate}
+                            className="flex items-center text-sm"
+                          >
+                            <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
+                            {candidate}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No candidate selected</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4 pt-4">
+                <button
+                  onClick={handleEditVotes}
+                  className="flex-1 px-4 py-2 border border-border rounded-md hover:bg-muted transition-colors"
+                >
+                  Edit Votes
+                </button>
+                <button
+                  onClick={handleConfirmVote}
+                  className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
+                >
+                  Confirm & Submit
+                </button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     );
   }
 
@@ -336,10 +432,10 @@ const VotingInterface = () => {
               ))}
               
               <button
-                onClick={handleSubmit}
+                onClick={handleReviewSubmit}
                 className="w-full bg-primary text-primary-foreground py-3 rounded-md hover:opacity-90 transition-opacity font-medium mt-8"
               >
-                Submit Votes
+                Review & Submit Votes
               </button>
             </motion.div>
           )}
