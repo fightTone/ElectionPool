@@ -3,9 +3,9 @@ version: '3.8'
 services:
   api:
     build: .
-    restart: always
+    network_mode: "host"
     ports:
-      - "80:80"
+      - "8080:8080"
     environment:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -13,15 +13,7 @@ services:
       - DB_PORT=${DB_PORT}
       - DB_NAME=${DB_NAME}
       - SECRET_KEY=${SECRET_KEY}
-      - ENVIRONMENT=production
-    network_mode: "bridge"  # Use bridge network to access host
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./:/app

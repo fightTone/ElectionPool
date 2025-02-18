@@ -9,33 +9,21 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
 COPY requirements.txt .
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
+# Set longer timeout and retry mechanism for pip
+ENV PIP_DEFAULT_TIMEOUT=100 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_DEFAULT_TIMEOUT=100 \
-    ENVIRONMENT=production
+    PIP_NO_CACHE_DIR=1
 
-# Install Python packages
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir uvicorn[standard] gunicorn
+# Install packages with retries
+RUN pip config set global.timeout 100 && \
+    pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --retries 3 -r requirements.txt && \
+    pip install --no-cache-dir uvicorn[standard]
 
-# Copy application code
 COPY . .
 
-# Create non-root user
-RUN adduser --disabled-password --gecos '' appuser && \
-    chown -R appuser:appuser /api
+EXPOSE 8080
 
-USER appuser
-
-# Expose port 80
-EXPOSE 80
-
-# Start the application with Gunicorn
-CMD ["gunicorn", "main:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:80"]
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80", "--reload"]
