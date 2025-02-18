@@ -7,7 +7,7 @@ services:
     ports:
       - "80:80"
     environment:
-      - VITE_API_URL=http://3.84.6.19:8080
+      - VITE_API_URL=http://165.232.163.148:80
     networks:
       - election-network
     stdin_open: true
