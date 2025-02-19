@@ -7,10 +7,13 @@ services:
     environment:
       - DB_USER=root
       - DB_PASSWORD=sandking
-      - DB_HOST=localhost
+      - DB_HOST=165.232.163.148    # Change this to your actual MySQL server IP
       - DB_PORT=3306
       - DB_NAME=election_db
       - SECRET_KEY=af6c94019cd346d0d6f50ee7cfb14e906b1fcda946c49822c4e8c506f04de1af
+    volumes:
+      - ./:/app
+      - certbot-www:/var/www/certbot
     networks:
       - api-network
 
@@ -31,3 +34,6 @@ services:
 networks:
   api-network:
     driver: bridge
+
+volumes:
+  certbot-www:
