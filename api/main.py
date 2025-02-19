@@ -366,4 +366,4 @@ async def get_barangay_results(barangay: str, db: Session = Depends(get_db)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=80, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)

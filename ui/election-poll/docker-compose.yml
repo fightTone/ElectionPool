@@ -6,8 +6,12 @@ services:
     build: .
     ports:
       - "80:80"
+      - "443:443"
     environment:
-      - VITE_API_URL=http://165.232.163.148:80
+      - VITE_API_URL=https://api1.pietone.com
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
     networks:
       - election-network
     stdin_open: true
