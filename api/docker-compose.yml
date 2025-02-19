@@ -2,8 +2,8 @@ services:
   api:
     build: .
     restart: always
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"    # Only expose internally
     environment:
       - DB_USER=root
       - DB_PASSWORD=sandking
