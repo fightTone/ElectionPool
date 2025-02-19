@@ -1,13 +1,16 @@
-version: '3.8'
-
 services:
   api:
     build: .
     restart: always
     ports:
       - "8080:8080"
-    env_file:
-      - .env
+    environment:
+      - DB_USER=root
+      - DB_PASSWORD=sandking
+      - DB_HOST=localhost
+      - DB_PORT=3306
+      - DB_NAME=election_db
+      - SECRET_KEY=af6c94019cd346d0d6f50ee7cfb14e906b1fcda946c49822c4e8c506f04de1af
     networks:
       - api-network
 
