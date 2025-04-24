@@ -209,70 +209,6 @@ const AnalyticsDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Pie Chart Card */}
-            <Card>
-              <CardHeader className="p-4 sm:p-6">
-                <CardTitle className="text-base sm:text-lg">Vote Distribution by Barangay</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 sm:p-6">
-                <div className="h-[300px] sm:h-[350px] md:h-[400px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={barangayStats}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={getPieChartSize()}
-                        label={({ name, percent }) => {
-                          const label = `${name} (${(percent * 100).toFixed(1)}%)`;
-                          return window.innerWidth < 480 ? name : label;
-                        }}
-                        labelLine={{ stroke: 'hsl(var(--foreground))', strokeWidth: 1 }}
-                      >
-                        {barangayStats.map((_, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
-                            fill={`hsl(${142 + (index * 20)} 70% 45%)`}
-                            stroke="hsl(var(--background))"
-                            strokeWidth={2}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--background))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '0.5rem',
-                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                          padding: '8px 12px'
-                        }}
-                        itemStyle={{
-                          color: 'hsl(var(--foreground))',
-                          fontSize: '14px',
-                          padding: '2px 0'
-                        }}
-                        formatter={(value, name, entry) => [
-                          `${name}\n${value} votes (${entry.payload.percentage.toFixed(1)}%)`,
-                          ''
-                        ]}
-                        labelStyle={{
-                          color: 'hsl(var(--foreground))',
-                          fontWeight: 'bold',
-                          marginBottom: '4px'
-                        }}
-                        wrapperStyle={{
-                          zIndex: 20,
-                          outline: 'none'
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Position Selector */}
             <Card>
               <CardHeader className="p-3 sm:p-4">
@@ -454,6 +390,70 @@ const AnalyticsDashboard = () => {
                       →
                     </motion.div>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Pie Chart Card - Moved to bottom */}
+            <Card>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">Vote Distribution by Barangay</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6">
+                <div className="h-[300px] sm:h-[350px] md:h-[400px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={barangayStats}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={getPieChartSize()}
+                        label={({ name, percent }) => {
+                          const label = `${name} (${(percent * 100).toFixed(1)}%)`;
+                          return window.innerWidth < 480 ? name : label;
+                        }}
+                        labelLine={{ stroke: 'hsl(var(--foreground))', strokeWidth: 1 }}
+                      >
+                        {barangayStats.map((_, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={`hsl(${142 + (index * 20)} 70% 45%)`}
+                            stroke="hsl(var(--background))"
+                            strokeWidth={2}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--background))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '0.5rem',
+                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                          padding: '8px 12px'
+                        }}
+                        itemStyle={{
+                          color: 'hsl(var(--foreground))',
+                          fontSize: '14px',
+                          padding: '2px 0'
+                        }}
+                        formatter={(value, name, entry) => [
+                          `${name}\n${value} votes (${entry.payload.percentage.toFixed(1)}%)`,
+                          ''
+                        ]}
+                        labelStyle={{
+                          color: 'hsl(var(--foreground))',
+                          fontWeight: 'bold',
+                          marginBottom: '4px'
+                        }}
+                        wrapperStyle={{
+                          zIndex: 20,
+                          outline: 'none'
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>

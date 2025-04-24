@@ -81,7 +81,7 @@ class VoteCreate(BaseModel):
         # Check each position's votes
         for position, data in CANDIDATES_DATA.items():
             position_votes = votes.get(position, [])
-            max_votes = 8 if position == "MEMBER, SANGGUNIANG PANLUNGSOD" else 1
+            max_votes = 8 if position == "MEMBER, SANGGUNIANG BAYAN" else 1
             
             # Validate votes for this position
             if position_votes:
@@ -177,7 +177,7 @@ async def submit_vote(vote: VoteCreate, db: Session = Depends(get_db)):
             "summary": {
                 position: {
                     "selected": len(candidates),
-                    "maximum": 8 if position == "MEMBER, SANGGUNIANG PANLUNGSOD" else 1,
+                    "maximum": 8 if position == "MEMBER, SANGGUNIANG BAYAN" else 1,
                     "votes": candidates
                 }
                 for position, candidates in vote.votes.items()
@@ -292,7 +292,7 @@ async def get_position_results(position: str, db: Session = Depends(get_db)):
         "total_votes": total_position_votes,
         "last_updated": datetime.utcnow(),
         "results": results,
-        "vote_limit": 8 if position == "MEMBER, SANGGUNIANG PANLUNGSOD" else 1
+        "vote_limit": 8 if position == "MEMBER, SANGGUNIANG BAYAN" else 1
     }
 
 @app.get("/api/stats/hourly")
