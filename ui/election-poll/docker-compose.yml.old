@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  frontend:
+    container_name: election-poll-ui
+    build: .
+    ports:
+      - "80:80"
+    environment:
+      - VITE_API_URL=http://165.232.163.148:80
+    networks:
+      - election-network
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+networks:
+  election-network:
+    driver: bridge
