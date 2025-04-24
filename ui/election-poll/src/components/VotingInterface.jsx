@@ -80,7 +80,7 @@ const VotingInterface = () => {
 
   const handleVoteChange = (position, candidate) => {
     const currentVotes = votes[position] || [];
-    const maxVotes = position === "MEMBER, SANGGUNIANG PANLUNGSOD" ? 8 : 1;
+    const maxVotes = position === "MEMBER, SANGGUNIANG BAYAN" ? 8 : 1;
 
     if (currentVotes.includes(candidate)) {
       setVotes({
