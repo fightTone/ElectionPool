@@ -1,6 +1,8 @@
 ﻿# ElectionPool
-https://app1.pietone.com
-https://api1.pietone.com
+
+you can check at:
+- https://app1.pietone.com
+- https://api1.pietone.com
 
 ![Screenshot](https://github.com/fightTone/ElectionPool/blob/main/sample_images/1.png)
 ![Screenshot](https://github.com/fightTone/ElectionPool/blob/main/sample_images/2.png)
