@@ -1,7 +1,7 @@
 ﻿# ElectionPool
 
 you can check at:
-- https://app1.pietone.com/analytics
+- https://app1.pietone.com
 - https://api1.pietone.com/docs
 
 ![Screenshot](https://github.com/fightTone/ElectionPool/blob/main/sample_images/1.png)
